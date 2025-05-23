@@ -1,6 +1,6 @@
 # React & React with TypeScript
 
-Mono-repositorio multi-paquete para React con TypeScript.
+**Mono-repositorio** **multi-paquete** para React con TypeScript.
 
 ## Instalación
 
