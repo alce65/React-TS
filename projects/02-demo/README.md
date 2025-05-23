@@ -26,7 +26,8 @@ Demo de una lista de elementos
 
 CRUD de notas implementado con diversas estrategia:
 
-- 01.Basic: estado y funciones del CRUD en el componente padre (NoteList)
+- 01.Basic: estado y funciones del CRUD en el componente padre (NoteList). Mock de notas como prop
+- 02.LoadService: mock de servicio usado desde el padre (NoteList) para cargar las notas Se utiliza useEffect
 
 ## Initial project
 

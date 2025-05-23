@@ -1,9 +1,9 @@
 import { render, type RenderResult, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { NoteItem } from './note-item';
+import { NoteItem1 } from './note-item';
 
-describe('NoteItem', () => {
+describe('NoteItem1', () => {
     const note = {
         id: '1',
         title: 'Nota 1',
@@ -18,7 +18,7 @@ describe('NoteItem', () => {
 
     beforeEach(() => {
         r = render(
-            <NoteItem
+            <NoteItem1
                 note={note}
                 deleteNote={deleteNote}
                 updateNote={updateNote}
