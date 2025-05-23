@@ -4,3 +4,9 @@
   padding: 2rem;
   text-align: center;
 }
+
+.subtitle {
+  font-size: 1.2rem;
+  text-decoration: underline;
+  margin: 0.5rem 0;
+}

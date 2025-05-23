@@ -15,3 +15,14 @@ Por ser parte de un monorepo, de la instalación inicial de Vite con React y Typ
 ## Content
 
 Demos del Módulo 2 del curso de TS medio con React
+
+- Componente DisplayField
+- Componente Item
+- Componente Focus
+- Hook useToggle
+- Hook useLocalStorage\<T>
+
+- Componente User
+- Hook UseUser
+
+- Componente CounterFlux
