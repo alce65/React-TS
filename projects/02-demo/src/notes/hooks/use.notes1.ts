@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import type { DTONote, Note } from '../types/note';
 import { getNotes } from '../services/repo.notes';
 
-type UseNotes = {
+export type UseNotes = {
     notes: Note[];
     loadNotes: () => Promise<void>;
     addNote: (note: DTONote) => void;
