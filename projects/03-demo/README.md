@@ -11,3 +11,7 @@ Por ser parte de un monorepo, de la instalación inicial de Vite con React y Typ
 - .gitignore
 - eslint.config.js
 - el contenido original del readme
+
+## Content
+
+Demos del Módulo 1 del curso de TS medio con React
