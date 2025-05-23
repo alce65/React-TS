@@ -22,6 +22,12 @@ Demo de una lista de elementos
 - useEffect -> loadData
 - useCallback para loadData, con [getData] como dependencia
 
+## Notas
+
+CRUD de notas implementado con diversas estrategia:
+
+- 01.Basic: estado y funciones del CRUD en el componente padre (NoteList)
+
 ## Initial project
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

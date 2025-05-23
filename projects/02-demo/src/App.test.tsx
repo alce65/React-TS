@@ -4,7 +4,7 @@ import App from "./App";
 describe("App", () => {
   test("", () => {
     render(<App />);
-    const title = screen.getByText(/Vite & React/i);
-    expect(title).toBeInTheDocument();
+    const info = screen.getByText(/proyecto/i);
+    expect(info).toBeInTheDocument();
   });
 });
