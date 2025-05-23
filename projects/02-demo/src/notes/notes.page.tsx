@@ -4,7 +4,8 @@ import { NoteList2 } from './components/02-load-service/note-list';
 import { NoteList3 } from './components/03-with-context/note-list';
 import { NoteList4 } from './components/04-with-hook-context/note-list';
 import { AppContextProvider } from './context/app.context.provider';
-import { NOTES } from '../data/notes';
+import { NOTES } from './data/notes';
+import { NoteList5 } from './components/05-with-flux-hook-contex/note-list';
 
 export function NotesPage(): JSX.Element {
     const initialNotes = NOTES;
@@ -13,7 +14,6 @@ export function NotesPage(): JSX.Element {
         <AppContextProvider>
             <div>
                 <h1>Notas</h1>
-
                 <NoteList1 initialNotes={initialNotes} />
                 <hr />
                 <NoteList2 />
@@ -21,6 +21,8 @@ export function NotesPage(): JSX.Element {
                 <NoteList3 />
                 <hr />
                 <NoteList4 />
+                <hr />
+                <NoteList5 />
             </div>
         </AppContextProvider>
     );
