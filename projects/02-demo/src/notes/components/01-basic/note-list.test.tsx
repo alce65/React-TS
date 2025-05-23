@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type { Note } from "../../types/note";
-import { NoteList } from "./note-list";
+import { NoteList1 } from "./note-list";
 
 describe("NoteList", () => {
     const notes: Note[] = [
@@ -15,7 +15,7 @@ describe("NoteList", () => {
 
     describe("render", () => {
         beforeEach(() => {
-            render(<NoteList initialNotes={notes} />);
+            render(<NoteList1 initialNotes={notes} />);
         });
 
         it("should render the note list correctly", () => {

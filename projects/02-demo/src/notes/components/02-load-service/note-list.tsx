@@ -4,7 +4,7 @@ import { NoteItem1 } from './note-item';
 import { NoteAdd1 } from './note-add';
 import { getNotes } from '../../services/repo.notes';
 
-export function NoteList1(): JSX.Element {
+export function NoteList2(): JSX.Element {
     const initialNotes: Note[] = [];
     const [notes, setNotes] = useState(initialNotes);
 
@@ -34,6 +34,7 @@ export function NoteList1(): JSX.Element {
 
     const template = (
         <>
+            <h2>Lista de Notas 02</h2>
             <NoteAdd1 add={addNote} />
             <div className="note-list">
                 {notes.map((note) => (

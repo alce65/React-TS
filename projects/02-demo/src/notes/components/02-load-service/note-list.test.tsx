@@ -2,11 +2,11 @@ import { act, render, screen } from '@testing-library/react';
 import type { Mock} from 'vitest';
 import '@testing-library/jest-dom';
 import type { Note } from '../../types/note';
-import { NoteList1 } from './note-list';
+import { NoteList2 } from './note-list';
 import { getNotes } from '../../services/repo.notes';
 
 // vi.mock('../../services/repo.notes', () => ({
-//     getNotes: jest.fn(() => Promise.resolve([
+//     getNotes: vi.fn(() => Promise.resolve([
 //         {
 //             id: "1",
 //             title: "Nota 1",
@@ -33,7 +33,7 @@ describe('NoteList1', () => {
     describe('render', () => {
         beforeEach(async () => {
             await act(async () => {
-                render(<NoteList1 />);
+                render(<NoteList2 />);
             });
         });
 

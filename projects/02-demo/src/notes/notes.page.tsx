@@ -1,36 +1,27 @@
-import type { JSX } from "react";
-import { NoteList } from "./components/01-basic/note-list";
-import type { Note } from "./types/note";
+import type { JSX } from 'react';
+import { NoteList1 } from './components/01-basic/note-list';
+import { NoteList2 } from './components/02-load-service/note-list';
+import { NoteList3 } from './components/03-with-context/note-list';
+import { NoteList4 } from './components/04-with-hook-context/note-list';
+import { AppContextProvider } from './context/app.context.provider';
+import { NOTES } from '../data/notes';
 
 export function NotesPage(): JSX.Element {
-
-
-    const initialNotes: Note[] = [
-        {
-            id: "1",
-            title: "Nota 1",
-            content: "Contenido de la nota 1",
-            isImportant: false,
-        },
-        {
-            id: "2",
-            title: "Nota 2",
-            content: "Contenido de la nota 2",
-            isImportant: true,
-        },
-        {
-            id: "3",
-            title: "Nota 3",
-            content: "Contenido de la nota 3",
-            isImportant: false,
-        },
-    ]
+    const initialNotes = NOTES;
 
     return (
-        <div>
-            <h1>Notas</h1>
-            <p>Esta es la página de notas.</p>
-            <NoteList initialNotes={initialNotes} />
-        </div>
+        <AppContextProvider>
+            <div>
+                <h1>Notas</h1>
+
+                <NoteList1 initialNotes={initialNotes} />
+                <hr />
+                <NoteList2 />
+                <hr />
+                <NoteList3 />
+                <hr />
+                <NoteList4 />
+            </div>
+        </AppContextProvider>
     );
 }

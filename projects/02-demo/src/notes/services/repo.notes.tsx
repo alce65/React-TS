@@ -1,6 +1,7 @@
+import { NOTES } from '../../data/notes';
 import type { DTONote, Note } from '../types/note';
 
-const notes: Note[] = [];
+const notes =  NOTES
 
 export const getNotes = async (): Promise<Note[]> => notes;
 
