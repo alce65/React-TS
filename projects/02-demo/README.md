@@ -28,6 +28,11 @@ CRUD de notas implementado con diversas estrategia:
 
 - 01.Basic: estado y funciones del CRUD en el componente padre (NoteList). Mock de notas como prop
 - 02.LoadService: mock de servicio usado desde el padre (NoteList) para cargar las notas Se utiliza useEffect
+  El resto de la lógica del CRUD se mantiene en el padre (NoteList)
+- 03-with-context: se utiliza un contexto que proporciona las notas iniciales
+  El resto de la lógica del CRUD se mantiene en el padre (NoteList)
+- 04-with-hook-context: se utiliza un contexto como provider de un custom hook.
+  Toda la lógica del CRUD esta en el custom hook (useNotes)
 
 ## Initial project
 
