@@ -1,11 +1,5 @@
 # React Router
 
-En sus versiones 7.x existen tres estrategias de uso:
-
-- Declarativa
-- Data (Programática)
-- Framework
-
 - [React Router](#react-router)
   - [Declarativa](#declarativa)
     - [Provider y Rutas](#provider-y-rutas)
@@ -18,6 +12,17 @@ En sus versiones 7.x existen tres estrategias de uso:
       - [Componente App](#componente-app)
       - [Rutas Anidadas](#rutas-anidadas-1)
     - [Menu y navegación](#menu-y-navegación)
+      - [Componente Menu](#componente-menu)
+      - [SPA](#spa)
+      - [Test funcional del menú](#test-funcional-del-menú)
+    - [Rutas dinámicas](#rutas-dinámicas)
+      - [Test del componente ProductDetail](#test-del-componente-productdetail)
+
+En sus versiones 7.x existen tres estrategias de uso:
+
+- Declarativa
+- Data (Programática)
+- Framework
 
 ## Declarativa
 
@@ -459,7 +464,7 @@ import { Link } from 'react-router-dom';
 
 Ahora, al hacer clic en un enlace del menú, la navegación se realiza sin recargar la página, manteniendo el estado de la aplicación y mejorando la experiencia del usuario.
 
-### Test funcional del menú
+#### Test funcional del menú
 
 Para testear de forma unitaria el menu SPA necesitamos comprobar que el Link responde cuando hacemos click, sinnecesidad de que se cargue realmente ninguna ruta.
 
@@ -527,3 +532,128 @@ test('should respond when we click the link to home', async () => {
 ```
 
 Y lo mismo para cada una de las rutas,
+
+### Rutas dinámicas
+
+Para utilizar rutas dinámicas creamos la feature Products
+
+- La entidad correspondiente
+- un Mock de productos almacenado como una constante
+- Un servicio con métodos asíncronos para obtener los productos y uno por id
+- Un componente Products que renderiza una lista de productos
+- Un componente Product que renderiza un producto por id
+
+En al componente `Products` cada item tiene un link con una ruta diáminca:
+
+- parte fija: `/products/`
+- segmento dinámica: el id de cada producto, que será identificado como `:id`
+
+```tsx
+<ul className="products-list">
+  {items.map((item) => (
+    <li className="product-item" key={item.id}>
+      <Link to={'/product/' + item.id}>{item.name}</Link>
+    </li>
+  ))}
+</ul>;
+``;
+```
+
+En las rutas se incluye una nueva, con el patron dinámico `/product/:id`:
+
+```tsx
+<Routes>
+  <Route path="/" element={<Layout title={title} />}>
+    ...
+    <Route path="product/:id" element={<ProductDetail />} />
+    ...
+  </Route>
+</Routes>
+```
+
+El componente `ProductDetail` recupera el id de la ruta y el resto de sus datos del servicio, para poder mostrar el producto correspondiente:
+
+```tsx
+const { id } = useParams<{ id: UUID }>();
+const [product, setProduct] = useState<Product | null>(null);
+useEffect(() => {
+  const loadData = async (id: UUID): Promise<void> => {
+    console.log('Loading product data for ID:', id);
+    // Simulate fetching product data
+    const fetchedProduct: Product = await repo.getProductById(id);
+    setProduct(() => fetchedProduct);
+  };
+  loadData(id as UUID);
+}, [id]);
+```
+
+Ademas se añade un botón de volver al inicio como ejemplo de navegación programática, que utiliza el hook `useNavigate` de React Router:
+
+```tsx
+const navigate = useNavigate();
+const handleClick = (): void => {
+  console.log('Button clicked, navigating to home');
+  navigate('/');
+};
+```
+
+#### Test del componente ProductDetail
+
+Además ed usar una ruta dinámicac, el componente `ProductDetail` utiliza un servicio para obtener los datos del producto, por lo que es necesario usar un mock para poder testarlo y hay que tener en cuenta el carácter asíncrono de los datos que se van a mostrar.
+
+```tsx
+const product: Product = {
+  id: '46392892-ac1e-4b5b-b395-978c318ef7ef',
+  name: 'Product_1',
+  description: 'Description of Product 1',
+  price: 100,
+  category: 'Category 1',
+  image: 'https://example.com/product1.jpg',
+};
+const url = '/product/' + product.id;
+beforeEach(async () => {
+  vi.spyOn(repo, 'getProductById').mockResolvedValue(product);
+  await act(async () =>
+    render(
+      <MemoryRouter initialEntries={[url]}>
+        <Routes>
+          <Route path="/product/:id" element={<ProductDetail />}></Route>
+        </Routes>
+      </MemoryRouter>,
+    ),
+  );
+});
+```
+
+En el test se comprueba que se renderiza el producto con los datos correctos. No es necesario que sea asíncrono, porque el act que envuelve al render ya ha esperado que se resuelva la carga de datos del producto:
+
+```tsx
+test('should render product details', () => {
+  const name = screen.getByText(new RegExp(product.name, 'i'));
+  expect(name).toBeInTheDocument();
+  if (product.description) {
+    const description = screen.getByText(new RegExp(product.description, 'i'));
+    expect(description).toBeInTheDocument();
+  }
+  const price = screen.getByText(new RegExp(`${product.price}€`, 'i'));
+  expect(price).toBeInTheDocument();
+  if (product.category) {
+    const category = screen.getByText(new RegExp(product.category, 'i'));
+    expect(category).toBeInTheDocument();
+  }
+});
+```
+
+Por último se testa que el botón de volver al inicio navega a la ruta `/`:
+
+```tsx
+    test('should navigate to home when button is clicked', () => {
+        const button = screen.getByRole('button', { name: /volver/i });
+        expect(button).toBeInTheDocument();
+        button.click();
+        expect(history.location.pathname).toBe('/');
+    });
+});
+```
+
+En este caso es sencillo porque, a diferencia del Link, la función `navigate` del hook `useNavigate` si modifica el objeto `history` del navegador, por lo que podemos comprobar que la ruta ha cambiado correctamente.
