@@ -1,4 +1,6 @@
-const url = 'https://jsonplaceholder.typicode.com/users';
+import { URL } from "../config";
+
+const url = URL
 
 export type User = {
   id: number;

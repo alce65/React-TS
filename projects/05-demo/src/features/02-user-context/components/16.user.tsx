@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
-import { useUser } from '../hooks/3.use.user';
+import { useContext, useEffect } from "react";
+import { UserContext } from "../context/user.context";
 
 // Ejemplo de un componente que obtiene datos de un servicio y los muestra
 // con la lógica de carga y error en el custom hook useUser
 
-export const UserLogged: React.FC = () => {
-    const { user, loading, error, load } = useUser();
+export const UserLoggedFromContext: React.FC = () => {
+    const {
+        userContext: { user, loading, error, load },
+    } = useContext(UserContext);
 
     useEffect(() => {
         load();
@@ -20,7 +22,7 @@ export const UserLogged: React.FC = () => {
                 <div>
                     <h4>{user.name}</h4>
                     <p>Email: {user.email}</p>
-                    <p>Username: {user.username}</p>
+                    <p>Username: {user.name}</p>
                 </div>
             )}
         </div>

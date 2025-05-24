@@ -18,11 +18,14 @@ Demos del Módulo 3 del curso de TS medio con React
 
 - Componente ClassComponent (Class) - Sin hacer
 - Componente UserCard (Class) - Sin Hacer
-- Feature User-services
+- Feature user-services
   - Servicio: InMemoryUserRepository
   - Servicio: APIUserRepository
   - Hooks: useUser
   - Componente UserLogged
-- ThemeLanguageContext
-- UserContext
-- 
+- Context
+  - ThemeLanguageContext
+- Feature: user-context
+  - Context: UserContext
+  - Hooks: useUser
+  - Componente UserLoggedFromContext

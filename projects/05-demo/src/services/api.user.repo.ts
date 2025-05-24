@@ -1,7 +1,8 @@
-import { User, UserDTO, UserRepository } from "./repo";
+import { URL } from "../config";
+import type { User, UserDTO, UserRepository } from "./repo";
 
 export class ApiUserRepository implements UserRepository {
-    private apiUrl = "https://api.example.com/users";
+    private apiUrl = URL;
 
     async getUserById(id: number): Promise<User> {
         const response = await fetch(`${this.apiUrl}/${id}`);
