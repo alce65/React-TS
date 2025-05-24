@@ -1,10 +1,10 @@
-import reactLogo from '../../assets/react.svg';
+import reactLogo from '../../../assets/react.svg';
 import './header.css';
 
 type Props = {
-    title: string;
+    title?: string;
 };
-export const Header: React.FC<Props> = ({ title = 'Demo 06' }) => {
+export const Header: React.FC<Props> = ({ title = 'Demo' }) => {
     return (
         <header className="header">
             <a href="https://react.dev" target="_blank">
