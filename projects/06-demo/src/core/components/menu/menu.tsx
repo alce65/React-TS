@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { NavLink } from 'react-router';
 import './menu.css';
 
 type MenuOption = {
@@ -18,9 +18,9 @@ export const Menu: React.FC = () => {
             <ul>
                 {menuOptions.map((option) => (
                     <li key={option.path}>
-                        <Link to={option.path} className="menu-link">
+                        <NavLink to={option.path} className="menu-link">
                             {option.label}
-                        </Link>
+                        </NavLink>
                     </li>
                 ))}
             </ul>
