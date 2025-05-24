@@ -381,7 +381,7 @@ export const Menu: React.FC = () => {
 };
 ```
 
-El test del menu, sin ser todavia funcional, se limita a comprobar que se renderiza el componente y que contiene los enlaces definidos:
+El test del menu, sin ser todavía funcional, se limita a comprobar que se renderiza el componente y que contiene los enlaces definidos:
 
 ```tsx
 describe('Menu component', () => {
@@ -442,3 +442,88 @@ export const Layout: React.FC<Props> = ({ title = '' }) => {
 ```
 
 De esta forma mantenemos la semántica del HTML, que indica los elementos de navegación dentro del `header`, y el componente `Menu` se renderiza como parte del `Header`.
+
+#### SPA
+
+Al utilizar href en los enlaces del menú, la navegación es una MPA, ya que recarga la página al hacer clic en un enlace.
+
+Para que sea una SPA, se debe utilizar el componente `Link` de React Router para navegar entre las diferentes rutas sin recargar la página.
+
+```tsx
+import { Link } from 'react-router-dom';
+...
+<Link to={option.path} className="menu-link">
+  {option.label}
+</Link>;
+```
+
+Ahora, al hacer clic en un enlace del menú, la navegación se realiza sin recargar la página, manteniendo el estado de la aplicación y mejorando la experiencia del usuario.
+
+### Test funcional del menú
+
+Para testear de forma unitaria el menu SPA necesitamos comprobar que el Link responde cuando hacemos click, sinnecesidad de que se cargue realmente ninguna ruta.
+
+Para ello, podemos utilizar el objeto history del navegador, pero el problema es que MemoryRouter no modifica la URL del navegador real (window.location), ya que funciona completamente en memoria y React Router no expone el estado de location fuera de su contexto.
+
+La librería **history** (usada internamente tanto por React Router como por Remix) puede ayudarnos si usas un router controlado como unstable_HistoryRouter y si creamos un objeto history.
+
+La podemos instalar con:
+
+```bash
+npm i -D history
+```
+
+A continuación usamos **createMemoryHistory** y **unstable_HistoryRouter** (de React Router)
+
+```tsx
+import { render, screen } from '@testing-library/react';
+import { Menu } from './menu';
+import {
+    unstable_HistoryRouter as Router,
+    type HistoryRouterProps,
+} from 'react-router';
+import { createMemoryHistory } from 'history';
+
+describe('Menu component', () => {
+    const history = createMemoryHistory();
+
+    beforeEach(() => {
+        history.push('/test');
+        history.push = vi.fn();
+        render(
+            <Router
+                history={history as unknown as HistoryRouterProps['history']}
+            >
+                <Menu />
+            </Router>,
+        );
+    });
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+    ...
+})
+```
+
+Ahora podemos comprobar que al hacer clic en un enlace del menú, se llama a la función `push` del objeto `history`, que es la que se encarga de cambiar la ruta actual sin recargar la página.
+
+```tsx
+test('should respond when we click the link to home', async () => {
+  const option = screen.getByText(/home/i) as HTMLAnchorElement;
+  expect(option.href).toContain('/');
+  option.click();
+  // Check if history.push was called with the correct path
+  expect(history.push).toHaveBeenCalledWith(
+    expect.objectContaining({
+      hash: '',
+      pathname: '/',
+      search: '',
+    }),
+    undefined,
+    expect.anything(),
+  );
+});
+``;
+```
+
+Y lo mismo para cada una de las rutas,
