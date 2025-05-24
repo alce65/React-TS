@@ -11,17 +11,9 @@ describe('Layout component', () => {
     beforeEach(() => {
         render(
             <MemoryRouter>
-                <Layout title="Demo 06">
-                    <div>Test Content</div>
-                </Layout>
+                <Layout title="Demo 06"></Layout>
             </MemoryRouter>,
         );
-    });
-
-    test('should render children content', () => {
-        const content = document.querySelector('.main');
-        expect(content).toBeInTheDocument();
-        expect(content?.textContent).toBe('Test Content');
     });
 
     test('should call components Header and Footer', () => {

@@ -159,17 +159,17 @@ Las mismas rutas se pueden definir de forma anidada, creando un nuevo componente
 
 ```tsx
 type Props = {
-    children: JSX.Element;
-    title: string;
+  children: JSX.Element;
+  title: string;
 };
 export const Layout: React.FC<Props> = ({ title, children }) => {
-    return (
-        <>
-            <Header title={title} />
-            <main className="main">{children}</main>
-            <Footer />
-        </>
-    );
+  return (
+    <>
+      <Header title={title} />
+      <main className="main">{children}</main>
+      <Footer />
+    </>
+  );
 };
 ```
 
@@ -182,26 +182,26 @@ vi.mock('../header/header');
 vi.mock('../footer/footer');
 
 describe('Layout component', () => {
-    beforeEach(() => {
-        render(
-            <MemoryRouter>
-                <Layout title="Demo 06">
-                    <div>Test Content</div>
-                </Layout>
-            </MemoryRouter>,
-        );
-    });
+  beforeEach(() => {
+    render(
+      <MemoryRouter>
+        <Layout title="Demo 06">
+          <div>Test Content</div>
+        </Layout>
+      </MemoryRouter>,
+    );
+  });
 
-    test('should render children content', () => {
-        const content = document.querySelector('.main');
-        expect(content).toBeInTheDocument();
-        expect(content?.textContent).toBe('Test Content');
-    });
+  test('should render children content', () => {
+    const content = document.querySelector('.main');
+    expect(content).toBeInTheDocument();
+    expect(content?.textContent).toBe('Test Content');
+  });
 
-    test('should call components Header and Footer', () => {
-        expect(Header).toHaveBeenCalled();
-        expect(Footer).toHaveBeenCalled();
-    });
+  test('should call components Header and Footer', () => {
+    expect(Header).toHaveBeenCalled();
+    expect(Footer).toHaveBeenCalled();
+  });
 });
 ```
 
@@ -211,25 +211,122 @@ El componente `App` ahora utiliza el componente `Layout` para envolver las rutas
 
 ```tsx
 export const App: React.FC = () => {
-    const title = import.meta.env.VITE_APP_TITLE || 'Demo 06 - Routes';
+  const title = import.meta.env.VITE_APP_TITLE || 'Demo 06 - Routes';
 
-    return (
-        <>
-            <Layout title={title}>
-                <AppRoutes />
-            </Layout>
-        </>
-    );
+  return (
+    <>
+      <Layout title={title}>
+        <AppRoutes />
+      </Layout>
+    </>
+  );
 };
 ```
 
 Siguiendo la forma de hacer los tests, el test de `App` se puede simplificar, ya que no es necesario comprobar que se llaman a los componentes `Header` y `Footer`, ya que ahora son parte del `Layout`.
 
 ```tsx
-
 vi.mock('../layout/layout', () => ({
-    Layout: vi.fn(({ children }) => <div>{children}</div>),
+  Layout: vi.fn(({ children }) => <div>{children}</div>),
 }));
+vi.mock('../../routes/app-routes');
+
+describe('App component', () => {
+  test('should call components Header and Footer', () => {
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(AppRoutes).toHaveBeenCalled();
+    expect(Layout).toHaveBeenCalled();
+  });
+});
+```
+
+En este caso, el mock del layout tiene que implementarse para que reciba los hijos, ya que el componente `App` los pasa como tal.
+
+#### Rutas Anidadas
+
+El componente Layout, puede integrarse en las rutas y anidar las rutas hijas. Para ello se sustituye el children por un elemento `Outlet` de React Router, que se encargará de renderizar las rutas hijas.
+
+```tsx
+type Props = {
+  title?: string;
+};
+export const Layout: React.FC<Props> = ({ title = '' }) => {
+  return (
+    <>
+      <Header title={title} />
+      <main className="main">
+        {/* This is where the child components will be rendered */}
+        <Outlet />
+      </main>
+      <Footer />
+    </>
+  );
+};
+```
+
+Su test tanbién se simplifica al no necesitar comprobar que se renderizan los hijos, ya que el `Outlet` se encargará de ello:
+
+```tsx
+vi.mock('../header/header');
+vi.mock('../footer/footer');
+
+describe('Layout component', () => {
+    beforeEach(() => {
+        render(
+            <MemoryRouter>
+                <Layout title="Demo 06"></Layout>
+            </MemoryRouter>,
+        );
+    });
+
+    test('should call components Header and Footer', () => {
+        expect(Header).toHaveBeenCalled();
+        expect(Footer).toHaveBeenCalled();
+    });
+});
+```
+
+Las rutas en el componente AppRoutes quedarían de la siguiente forma:
+
+```tsx
+type Props = {
+  title?: string;
+};
+export const AppRoutes: React.FC<Props> = ({ title }) => {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout title={title} />}>
+        <Route index element={<Home />} />
+        <Route path="about" element={<About />} />
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Route>
+    </Routes>
+  );
+};
+```
+
+Y el componente `App` solo cargaría las rutas, con lo que quedaría así:
+
+```tsx
+import { AppRoutes } from './routes/app-routes';
+export const App: React.FC = () => {
+  const title = import.meta.env.VITE_APP_TITLE || 'Demo 06 - Routes';
+
+  return (
+    <>
+      <AppRoutes title={title} />
+    </>
+  );
+};
+```
+
+Igualmente se simplificaría su test que solo necesita comprobar que llama al componente `AppRoutes`:
+
+```tsx
 vi.mock('../../routes/app-routes');
 
 describe('App component', () => {
@@ -240,32 +337,6 @@ describe('App component', () => {
             </MemoryRouter>,
         );
         expect(AppRoutes).toHaveBeenCalled();
-        expect(Layout).toHaveBeenCalled();
     });
 });
-```
-
-En este caso, el mock del layout tiene que implementarse para que reciba los hijos, ya que el componente `App` los pasa como tal.
-
-#### Rutas
-
-```tsx
-import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import About from './pages/About';
-import NotFound from './pages/NotFound';
-import Layout from './components/Layout';
-import './App.css';
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
-  );
-}
-export default App;
 ```
