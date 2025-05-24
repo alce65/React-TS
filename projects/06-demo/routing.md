@@ -8,15 +8,20 @@ En sus versiones 7.x existen tres estrategias de uso:
 
 - [React Router](#react-router)
   - [Declarativa](#declarativa)
-    - [Test de App](#test-de-app)
+    - [Provider y Rutas](#provider-y-rutas)
+      - [Test de App](#test-de-app)
     - [Fichero de rutas](#fichero-de-rutas)
       - [Test de rutas](#test-de-rutas)
     - [Rutas anidadas](#rutas-anidadas)
       - [Componente Layout](#componente-layout)
       - [Test del componente Layout](#test-del-componente-layout)
-      - [Rutas](#rutas)
+      - [Componente App](#componente-app)
+      - [Rutas Anidadas](#rutas-anidadas-1)
+    - [Menu y navegación](#menu-y-navegación)
 
 ## Declarativa
+
+### Provider y Rutas
 
 En el fichero main se añade un provider de las rutas:
 
@@ -55,7 +60,7 @@ function App() {
 export default App;
 ```
 
-### Test de App
+#### Test de App
 
 Al depender del proveedor de rutas, se debe envolver el componente a testar en un `MemoryRouter`:
 
@@ -275,18 +280,18 @@ vi.mock('../header/header');
 vi.mock('../footer/footer');
 
 describe('Layout component', () => {
-    beforeEach(() => {
-        render(
-            <MemoryRouter>
-                <Layout title="Demo 06"></Layout>
-            </MemoryRouter>,
-        );
-    });
+  beforeEach(() => {
+    render(
+      <MemoryRouter>
+        <Layout title="Demo 06"></Layout>
+      </MemoryRouter>,
+    );
+  });
 
-    test('should call components Header and Footer', () => {
-        expect(Header).toHaveBeenCalled();
-        expect(Footer).toHaveBeenCalled();
-    });
+  test('should call components Header and Footer', () => {
+    expect(Header).toHaveBeenCalled();
+    expect(Footer).toHaveBeenCalled();
+  });
 });
 ```
 
@@ -330,13 +335,110 @@ Igualmente se simplificaría su test que solo necesita comprobar que llama al co
 vi.mock('../../routes/app-routes');
 
 describe('App component', () => {
-    test('should call components Header and Footer', () => {
-        render(
-            <MemoryRouter>
-                <App />
-            </MemoryRouter>,
-        );
-        expect(AppRoutes).toHaveBeenCalled();
-    });
+  test('should call components Header and Footer', () => {
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(AppRoutes).toHaveBeenCalled();
+  });
 });
 ```
+
+### Menu y navegación
+
+#### Componente Menu
+
+Como parte del componente Layout añadimos un componente Menu, con los enlaces a las rutas.
+
+Pera la rutas utilizamos un array con la información de cada una de ellas y lo renderizamos de forma iterativa.
+
+```tsx
+type MenuOption = {
+  label: string;
+  path: string;
+};
+
+export const Menu: React.FC = () => {
+  const menuOptions: MenuOption[] = [
+    { label: 'Home', path: '/' },
+    { label: 'Products', path: '/products' },
+    { label: 'About', path: '/about' },
+  ];
+
+  return (
+    <nav className="menu">
+      <ul>
+        {menuOptions.map((option) => (
+          <li key={option.path}>
+            <a href={option.path}>{option.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};
+```
+
+El test del menu, sin ser todavia funcional, se limita a comprobar que se renderiza el componente y que contiene los enlaces definidos:
+
+```tsx
+describe('Menu component', () => {
+  test('should render project info', () => {
+    render(<Menu />);
+    let option = screen.getByText(/home/i);
+    expect(option).toBeInTheDocument();
+    option = screen.getByText(/about/i);
+    expect(option).toBeInTheDocument();
+    option = screen.getByText(/products/i);
+    expect(option).toBeInTheDocument();
+  });
+});
+```
+
+En el componente Header añadimos la posibilidad de recibir un children, que será el componente `Menu`:
+
+```tsx
+type Props = {
+  title?: string;
+  children?: React.ReactNode;
+};
+export const Header: React.FC<Props> = ({ title = 'Demo', children }) => {
+  return (
+    <header className="header">
+      <div className="header-main">
+        <a href="https://react.dev" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+        <h1>{title}</h1>
+      </div>
+      {children && <div className="header-children">{children}</div>}
+    </header>
+  );
+};
+```
+
+En el componente Layout, se añade el componente `Menu` como hijo del `Header`:
+
+```tsx
+type Props = {
+  title?: string;
+};
+export const Layout: React.FC<Props> = ({ title = '' }) => {
+  return (
+    <>
+      <Header title={title}>
+        <Menu />
+      </Header>
+      <main className="main">
+        {/* This is where the child components will be rendered */}
+        <Outlet />
+      </main>
+      <Footer />
+    </>
+  );
+};
+```
+
+De esta forma mantenemos la semántica del HTML, que indica los elementos de navegación dentro del `header`, y el componente `Menu` se renderiza como parte del `Header`.
