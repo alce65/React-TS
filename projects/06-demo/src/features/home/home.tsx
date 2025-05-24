@@ -11,3 +11,5 @@ export const Home: React.FC = () => {
         </section>
     );
 };
+
+export default Home;

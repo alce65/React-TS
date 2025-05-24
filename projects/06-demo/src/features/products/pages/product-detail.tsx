@@ -51,3 +51,5 @@ export const ProductDetail: React.FC = () => {
         </section>
     );
 };
+
+export default ProductDetail;

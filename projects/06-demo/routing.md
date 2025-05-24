@@ -17,6 +17,8 @@
       - [Test funcional del menú](#test-funcional-del-menú)
     - [Rutas dinámicas](#rutas-dinámicas)
       - [Test del componente ProductDetail](#test-del-componente-productdetail)
+    - [Carga diferida (Lazy loading) de las páginas](#carga-diferida-lazy-loading-de-las-páginas)
+      - [Test de las rutas con carga diferida](#test-de-las-rutas-con-carga-diferida)
 
 En sus versiones 7.x existen tres estrategias de uso:
 
@@ -657,3 +659,57 @@ Por último se testa que el botón de volver al inicio navega a la ruta `/`:
 ```
 
 En este caso es sencillo porque, a diferencia del Link, la función `navigate` del hook `useNavigate` si modifica el objeto `history` del navegador, por lo que podemos comprobar que la ruta ha cambiado correctamente.
+
+### Carga diferida (Lazy loading) de las páginas
+
+Se basa en la existencia en el estándar de JS de la posibilidad de importar **módulos** de forma **asíncrona**, utilizando la función `import()`.
+
+Para implementar el lazy loading en las rutas de React Router, se puede utilizar la función `lazy` de React, que permite cargar componentes de forma diferida. Para facilitar esta operación es conveniente que los componentes que se vayan a cargar de forma diferida estén exportados de forma `default`.
+
+```tsx
+const Home = React.lazy(() => import('../../features/home/home'));
+const Products = React.lazy(() => import('../../features/products/products'));
+const ProductDetail = React.lazy(
+  () => import('../../features/products/pages/product-detail'),
+);
+const About = React.lazy(() => import('../../features/about/about'));
+```
+
+Para ello, se importa el componente de forma diferida utilizando `React.lazy` y se envuelve en un `Suspense` para manejar el estado de carga.
+
+```tsx
+<Route
+  index
+  element={
+    <React.Suspense>
+      <Home />
+    </React.Suspense>
+  }
+/>
+```
+
+Y así con cada una de las rutas que se vayan a cargar de forma diferida.
+
+Para que el componente `Suspense` muestre algo mientras se carga el componente, se le puede pasar una prop `fallback` con un elemento que se mostrará durante la carga:
+
+```tsx
+<React.Suspense fallback={<div>Loading...</div>}>
+  <Home />
+```
+
+#### Test de las rutas con carga diferida
+
+El único cambio en loa test de las rutas es que se debe usar waitFor para esperar a que se resuelva la carga del componente diferido:
+
+```tsx
+test('should route to home page', async () => {
+  render(
+    <MemoryRouter initialEntries={['/']}>
+      <AppRoutes />
+    </MemoryRouter>,
+  );
+  await waitFor(() => {
+    expect(Home).toHaveBeenCalled();
+  });
+});
+```
