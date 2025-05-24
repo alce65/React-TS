@@ -15,3 +15,13 @@ Por ser parte de un monorepo, de la instalación inicial de Vite con React y Typ
 ## Content
 
 Demos del Módulo 1 del curso de TS medio con React
+
+- Componente HelloWorld
+- Componente Counter (1)
+- Componente Button
+- Componente Counter (2)
+- Componente SimpleForm
+- Componente Form
+- Componente CourseRegistration
+- Componente ProfileCard
+- Componente Box
