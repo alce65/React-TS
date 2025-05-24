@@ -41,7 +41,7 @@ export const TestHookComponent = (): JSX.Element => {
 
     return (
         <>
-            <h2>Test Hook</h2>
+            <h3>Test Hook</h3>
             <p>
                 {state ? 'On' : 'Off'}
                 <span> </span>

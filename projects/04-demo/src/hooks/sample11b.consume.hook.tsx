@@ -36,7 +36,7 @@ export const Sample11b: React.FC = () => {
 
     return (
         <div>
-            <h1>Sample 11b</h1>
+            <h3>Sample 11b</h3>
             <p>User nema: {user?.name}</p>
         </div>
     );
@@ -56,7 +56,7 @@ export const Sample11a: React.FC = () => {
 
     return (
         <div>
-            <h2>Sample 11b</h2>
+            <h3>Sample 11b</h3>
             <p>User name: {user.name}</p>
         </div>
     );

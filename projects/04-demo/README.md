@@ -22,7 +22,9 @@ Demos del Módulo 2 del curso de TS medio con React
 - Hook useToggle
 - Hook useLocalStorage\<T>
 
-- Componente User
-- Hook UseUser
+- Componente UserLogged
+- Hook UseUser + Componente UserLoggedWithHook
 
 - Componente CounterFlux
+- Componente CounterFluxPlus (con asincronía)
+- Componente Translator
