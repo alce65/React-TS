@@ -20,10 +20,36 @@ const root = createRoot(container);
 root.render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>
+  </BrowserRouter>,
 );
 ```
+
 En el fichero App se definen las rutas:
+
+```tsx
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import NotFound from './pages/NotFound';
+import Layout from './components/Layout';
+import './App.css';
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="*" element={<div>404 Not Found</div>} />
+    </Routes>
+  );
+}
+export default App;
+```
+
+### Fichero de rutas
+
+### Rutas anidadas
+
+Las mismas rutas se pueden definir de forma anidada:
 
 ```tsx
 import { Routes, Route } from 'react-router-dom';
