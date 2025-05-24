@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": [
+    "src",
+    "../02-demo/src/notes/types",
+    "../04-demo/src/features/user/sample12a.tsx",
+    "../04-demo/src/components/R19/sample6.contacts..tsx",
+    "../04-demo/src/components/R19/sample9.props.effect.tsx",
+    "../05-demo/src/features/01-services/hooks/3.use.user.ts",
+    "../05-demo/src/features/01-services/components/15.user.tsx",
+    "../05-demo/src/services"
+, "../05-demo/src/config.ts"  ]
+}
