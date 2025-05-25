@@ -45,8 +45,8 @@ export default defineConfig({
     include: ['**/*.test.ts', '**/*.test.tsx'],
     globals: true,
     coverage: {
-      include: ['src/**/*.ts'],
-      exclude: ['src/index.ts', 'src/**/types/*.ts'],
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      exclude: ['src/main.tsx', 'src/**/types/*.ts', 'src/**/*.d.ts'],
     },
   },
 });
