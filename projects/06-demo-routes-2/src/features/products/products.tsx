@@ -1,22 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 import type { Product } from './types/product.d';
 import repo from './services/products.service';
 import './products.css';
 
 export const Products: React.FC = () => {
-    const [items, setItems] = useState<Product[]>([]);
+    const loadedProducts = useLoaderData<Product[]>();
+    const [products, setProducts] = useState<Product[]>(loadedProducts || []);
 
     const loadData = useCallback(async (): Promise<void> => {
         console.log('useCallback ejecuta loadData');
         const data = await repo.getAllProducts();
-        setItems(() => data);
+        setProducts(() => data);
     }, []);
 
     useEffect(() => {
+        if (products.length !== 0) return;
         console.log('useEffect ejecuta loadData');
         loadData();
-    }, [loadData]);
+    }, [loadData, products.length]);
 
     return (
         <section className="products">
@@ -29,7 +31,7 @@ export const Products: React.FC = () => {
                 </p>
             </header>
             <ul className="products-list">
-                {items.map((item) => (
+                {products.map((item) => (
                     <li className="product-item" key={item.id}>
                         <Link to={'/product/' + item.id}>{item.name}</Link>
                     </li>

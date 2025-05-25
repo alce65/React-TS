@@ -13,6 +13,7 @@
       - [Test funcional del menú](#test-funcional-del-menú)
     - [Rutas dinámicas](#rutas-dinámicas)
       - [Products: carga de datos en la ruta](#products-carga-de-datos-en-la-ruta)
+      - [Test del componente Products](#test-del-componente-products)
       - [Rutas a los detalles de un producto](#rutas-a-los-detalles-de-un-producto)
       - [Componente ProductDetail](#componente-productdetail)
       - [Test del componente ProductDetail](#test-del-componente-productdetail)
@@ -397,6 +398,54 @@ Para utilizar rutas dinámicas creamos la feature Products
 - Un servicio con métodos asíncronos para obtener los productos y uno por id
 - Un componente Products que renderiza una lista de productos
 - Un componente Product que renderiza un producto por id
+
+La carga de los productos se realiza en el componente `Products`, que utiliza el servicio para obtener los datos de los productos y renderizarlos en una lista.
+
+Sin embargo, desde la ruta se puede adelantar la carga de los datos, utilizando el método `loader` de React Router, que permite cargar datos antes de renderizar el componente.
+
+```tsx
+const loadProductData = async (): Promise<Product[]> => {
+    const {default: repo} = await import('../../features/products/services/products.service');
+    return await repo.getAllProducts();
+};
+...
+  {
+    path: '/products',
+    Component: Products,
+    loader: loadProductData,
+  },
+```
+
+En el componente se puede acceder a los datos de forma sincrona utilizando el hook `useLoaderData` de React Router, que devuelve los datos cargados por el loader:
+
+```tsx
+import { useLoaderData } from 'react-router';
+
+const Products: React.FC = () => {
+  const loadedProducts = useLoaderData<Product[]>();
+  const [products, setProducts] = useState<Product[]>(loadedProducts || []);
+};
+```
+
+#### Test del componente Products
+
+Cuando los componentes usan elementos como `useLoaderData`, \<Link>, etc., deben renderizarse en el contexto de un provider de React Router. La función `createRoutesStub` crea ese contexto para probar los componentes de forma aislada.
+
+```tsx
+const Stub = createRoutesStub([
+  {
+    path: '/products',
+    Component: Products,
+    loader(): Product[] {
+      return [];
+    },
+  },
+]);
+
+await act(async () => {
+  render(<Stub initialEntries={['/products']} />);
+});
+```
 
 #### Rutas a los detalles de un producto
 
