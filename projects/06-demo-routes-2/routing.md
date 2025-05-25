@@ -468,23 +468,41 @@ En al componente `Products` cada item tiene un link con una ruta dinámica:
 En las rutas se incluye una nueva, con el patron dinámico `/product/:id`:
 
 ```tsx
-<Routes>
-  <Route path="/" element={<Layout title={title} />}>
-    ...
-    <Route path="product/:id" element={<ProductDetail />} />
-    ...
-  </Route>
-</Routes>
+{
+  path: 'product/:id',
+  loader: loadProductById,
+  lazy: {
+    Component: async () =>
+      (await import('../../features/products/pages/product-detail')).ProductDetail,
+  },
+},
+```
+
+El loader de esta ruta se encarga de cargar los datos del producto por id, utilizando el servicio correspondiente:
+
+```tsx
+const loadProductById = async ({
+  params,
+}: {
+  params: Record<string, unknown>;
+}): Promise<Product> => {
+  const { default: repo } = await import(
+    '../../features/products/services/products.service'
+  );
+  return await repo.getProductById(params.id as UUID);
+};
 ```
 
 #### Componente ProductDetail
 
-El componente `ProductDetail` recupera el id de la ruta y el resto de sus datos del servicio, para poder mostrar el producto correspondiente:
+El componente `ProductDetail` recupera el id de la ruta y el resto de sus datos desde la ruta, para poder mostrar el producto correspondiente:
 
 ```tsx
 const { id } = useParams<{ id: UUID }>();
-const [product, setProduct] = useState<Product | null>(null);
+const loadedProduct = useLoaderData<Product>();
+const [product, setProduct] = useState<Product | null>(loadedProduct);
 useEffect(() => {
+  if (loadedProduct.id === id) return;
   const loadData = async (id: UUID): Promise<void> => {
     console.log('Loading product data for ID:', id);
     // Simulate fetching product data
@@ -492,7 +510,7 @@ useEffect(() => {
     setProduct(() => fetchedProduct);
   };
   loadData(id as UUID);
-}, [id]);
+}, [id, loadedProduct]);
 ```
 
 Ademas se añade un botón de volver al inicio como ejemplo de navegación programática, que utiliza el hook `useNavigate` de React Router:
@@ -507,7 +525,9 @@ const handleClick = (): void => {
 
 #### Test del componente ProductDetail
 
-Además ed usar una ruta dinámicac, el componente `ProductDetail` utiliza un servicio para obtener los datos del producto, por lo que es necesario usar un mock para poder testarlo y hay que tener en cuenta el carácter asíncrono de los datos que se van a mostrar.
+Como sucedía en el test del componente Products, cuando los componentes usan elementos como `useLoaderData`, \<Link>, etc., deben renderizarse en el contexto de un provider de React Router. La función `createRoutesStub` crea ese contexto para probar los componentes de forma aislada.
+
+Además el componente `ProductDetail` utiliza alternativamente un servicio para obtener los datos del producto, por lo que es necesario usar un mock para poder testarlo y hay que tener en cuenta el carácter asíncrono de los datos que se van a mostrar.
 
 ```tsx
 const product: Product = {
@@ -519,17 +539,19 @@ const product: Product = {
   image: 'https://example.com/product1.jpg',
 };
 const url = '/product/' + product.id;
+
+const Stub = createRoutesStub([
+  {
+    path: '/product/:id',
+    Component: ProductDetail,
+    loader(): Product {
+      return product;
+    },
+  },
+]);
 beforeEach(async () => {
   vi.spyOn(repo, 'getProductById').mockResolvedValue(product);
-  await act(async () =>
-    render(
-      <MemoryRouter initialEntries={[url]}>
-        <Routes>
-          <Route path="/product/:id" element={<ProductDetail />}></Route>
-        </Routes>
-      </MemoryRouter>,
-    ),
-  );
+  await act(async () => render(<Stub initialEntries={[url]} />));
 });
 ```
 

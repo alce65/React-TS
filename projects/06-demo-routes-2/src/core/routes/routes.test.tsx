@@ -11,6 +11,8 @@ vi.mock('../../features/about/about');
 vi.mock('../../features/products/products');
 vi.mock('../../features/products/pages/product-detail');
 
+vi.mock('../../features/products/services/products.service');
+
 describe('App component', () => {
     test('should render info for invalid routes', () => {
         const router = createMemoryRouter(appRoutes, {

@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { ProductDetail } from './product-detail.tsx';
-import { MemoryRouter, Route, Routes } from 'react-router';
+import { createRoutesStub } from 'react-router';
 import repo from '../services/products.service';
 import type { Product } from '../types/product';
 
@@ -14,20 +14,19 @@ describe('ProductDetail component', () => {
         image: 'https://example.com/product1.jpg',
     };
     const url = '/product/' + product.id;
+
+    const Stub = createRoutesStub([
+        {
+            path: '/product/:id',
+            Component: ProductDetail,
+            loader(): Product {
+                return product;
+            },
+        },
+    ]);
     beforeEach(async () => {
         vi.spyOn(repo, 'getProductById').mockResolvedValue(product);
-        await act(async () =>
-            render(
-                <MemoryRouter initialEntries={[url]}>
-                    <Routes>
-                        <Route
-                            path="/product/:id"
-                            element={<ProductDetail />}
-                        ></Route>
-                    </Routes>
-                </MemoryRouter>,
-            ),
-        );
+        await act(async () => render(<Stub initialEntries={[url]} />));
     });
     test('should render project info', () => {
         const info = screen.getByRole('heading', {
@@ -45,9 +44,7 @@ describe('ProductDetail component', () => {
             );
             expect(description).toBeInTheDocument();
         }
-        const price = screen.getByText(
-            new RegExp(`${product.price}€`, 'i'),
-        );
+        const price = screen.getByText(new RegExp(`${product.price}€`, 'i'));
         expect(price).toBeInTheDocument();
         if (product.category) {
             const category = screen.getByText(
