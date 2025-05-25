@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
-import { AppRoutes } from './app-routes';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { Home } from '../../features/home/home';
 import { About } from '../../features/about/about';
 import { Products } from '../../features/products/products';
 import { ProductDetail } from '../../features/products/pages/product-detail';
+import { appRoutes } from './routes';
 
 vi.mock('../../features/home/home');
 vi.mock('../../features/about/about');
@@ -13,42 +13,27 @@ vi.mock('../../features/products/pages/product-detail');
 
 describe('App component', () => {
     test('should render info for invalid routes', () => {
-        render(
-            <MemoryRouter initialEntries={['/invalid-route']}>
-                <AppRoutes />
-            </MemoryRouter>,
-        );
+        const router = createMemoryRouter(appRoutes, {
+            initialEntries: ['/invalid-route'],
+        });
+        render(<RouterProvider router={router} />);
+
         const element = screen.getByText('404 Not Found');
         expect(element).toBeInTheDocument();
     });
 
     test('should route to home page', async () => {
-        render(
-            <MemoryRouter initialEntries={['/']}>
-                <AppRoutes />
-            </MemoryRouter>,
-        );
+        const router = createMemoryRouter(appRoutes, { initialEntries: ['/'] });
+        render(<RouterProvider router={router} />);
         await waitFor(() => {
             expect(Home).toHaveBeenCalled();
         });
     });
     test('should route to products page', async () => {
-        // const Products = vi.fn();
-        // const ProductDetail = vi.fn();
-        // vi.mock('../../features/products/products', () => ({
-        //     __esModule: true,
-        //     default: Products,
-        // }));
-        // vi.mock('../../features/products/pages/product-detail', () => ({
-        //     __esModule: true,
-        //     default: ProductDetail,
-        // }));
-
-        render(
-            <MemoryRouter initialEntries={['/products']}>
-                <AppRoutes />
-            </MemoryRouter>,
-        );
+        const router = createMemoryRouter(appRoutes, {
+            initialEntries: ['/products'],
+        });
+        render(<RouterProvider router={router} />);
 
         await waitFor(() => {
             expect(Products).toHaveBeenCalled();
@@ -56,22 +41,21 @@ describe('App component', () => {
     });
 
     test('should route to product detail page', async () => {
-        render(
-            <MemoryRouter initialEntries={['/product/1']}>
-                <AppRoutes />
-            </MemoryRouter>,
-        );
+        const router = createMemoryRouter(appRoutes, {
+            initialEntries: ['/product/1'],
+        });
+        render(<RouterProvider router={router} />);
 
         await waitFor(() => {
             expect(ProductDetail).toHaveBeenCalled();
         });
     });
+
     test('should route to about page', async () => {
-        render(
-            <MemoryRouter initialEntries={['/about']}>
-                <AppRoutes />
-            </MemoryRouter>,
-        );
+        const router = createMemoryRouter(appRoutes, {
+            initialEntries: ['/about'],
+        });
+        render(<RouterProvider router={router} />);
 
         await waitFor(() => {
             expect(About).toHaveBeenCalled();

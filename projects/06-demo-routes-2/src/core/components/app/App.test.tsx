@@ -1,18 +1,15 @@
 import { render } from '@testing-library/react';
 import { App } from './App';
+import { Header } from '../header/header';
+import { Footer } from '../footer/footer';
 
-import { MemoryRouter } from 'react-router';
-import { AppRoutes } from '../../routes/app-routes';
-
-vi.mock('../../routes/app-routes');
+vi.mock('../header/header');
+vi.mock('../footer/footer');
 
 describe('App component', () => {
     test('should call components Header and Footer', () => {
-        render(
-            <MemoryRouter>
-                <App />
-            </MemoryRouter>,
-        );
-        expect(AppRoutes).toHaveBeenCalled();
+        render(<App />);
+        expect(Header).toHaveBeenCalled();
+        expect(Footer).toHaveBeenCalled();
     });
 });

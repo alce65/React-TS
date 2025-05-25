@@ -2,24 +2,20 @@
 
 - [React Router](#react-router)
   - [Data (Programática)](#data-programática)
-  - [Declarativa](#declarativa)
     - [Provider y Rutas](#provider-y-rutas)
-      - [Test de App](#test-de-app)
-    - [Fichero de rutas](#fichero-de-rutas)
-      - [Test de rutas](#test-de-rutas)
-    - [Rutas anidadas](#rutas-anidadas)
-      - [Componente Layout](#componente-layout)
-      - [Test del componente Layout](#test-del-componente-layout)
-      - [Componente App](#componente-app)
-      - [Rutas Anidadas](#rutas-anidadas-1)
+      - [Componente App. Test de App](#componente-app-test-de-app)
+      - [Test de las rutas](#test-de-las-rutas)
+    - [Carga diferida (Lazy loading) de las páginas](#carga-diferida-lazy-loading-de-las-páginas)
+      - [Test de las rutas con carga diferida](#test-de-las-rutas-con-carga-diferida)
     - [Menu y navegación](#menu-y-navegación)
       - [Componente Menu](#componente-menu)
       - [SPA](#spa)
       - [Test funcional del menú](#test-funcional-del-menú)
     - [Rutas dinámicas](#rutas-dinámicas)
+      - [Products: carga de datos en la ruta](#products-carga-de-datos-en-la-ruta)
+      - [Rutas a los detalles de un producto](#rutas-a-los-detalles-de-un-producto)
+      - [Componente ProductDetail](#componente-productdetail)
       - [Test del componente ProductDetail](#test-del-componente-productdetail)
-    - [Carga diferida (Lazy loading) de las páginas](#carga-diferida-lazy-loading-de-las-páginas)
-      - [Test de las rutas con carga diferida](#test-de-las-rutas-con-carga-diferida)
 
 En sus versiones 7.x existen tres estrategias de uso:
 
@@ -29,50 +25,80 @@ En sus versiones 7.x existen tres estrategias de uso:
 
 ## Data (Programática)
 
-## Declarativa
+Las rutas no se definen de forma declarativa :
+
+```tsx
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/about" element={<About />} />
+  <Route path="*" element={<div>404 Not Found</div>} />
+</Routes>
+```
+
+En su lugar se crea un array de objetos que representan las rutas
+
+```tsx
+import { type RouteObject } from 'react-router-dom';
+export const routes: RouteObject[] = [
+  {
+    path: '/',
+    Component: App,
+    children: [
+      {
+        // path: '/',
+        index: true,
+        Component: Home,
+      },
+      {
+        path: '/products',
+        Component: Products,
+      },
+      {
+        path: 'product/:id',
+        Component: ProductDetail,
+      },
+      {
+        path: 'about',
+        Component: About,
+      },
+    ],
+  },
+];
+```
+
+Las rutas se pueden definir de forma anidada, utilizando la propiedad `children`.
+El componente por defecto puede indicarse con un `path: '\'` o con la propiedad `index: true`, que indica que es la ruta por defecto del padre.
 
 ### Provider y Rutas
 
-En el fichero main se añade un provider de las rutas:
+En el fichero main
+
+- Con el array importado de las rutas como parámetro se crea un router
+- se añade un provider de las rutas
 
 ```tsx
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
+import { createBrowserRouter BrowserRouter} from 'react-router-dom';
+import { appRoutes } from './core/routes/routes.ts';
 
-const container = document.getElementById('root')!;
+const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);
+
+const router = createBrowserRouter(routes);
 root.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>,
+  <StrictMode>
+    <RouterProvider router={appRouter} />
+  </StrictMode>,
 );
 ```
 
-En el fichero App se definen las rutas:
+El nuevo formato del RouterProvider ya no encapsula ningún componente, sino que recibe un objeto `router` que contiene las rutas definidas.
 
-```tsx
-import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import About from './pages/About';
-import NotFound from './pages/NotFound';
-import Layout from './components/Layout';
-import './App.css';
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="*" element={<div>404 Not Found</div>} />
-    </Routes>
-  );
-}
-export default App;
-```
+#### Componente App. Test de App
 
-#### Test de App
+Para simplificar App actúa como layout, en lugar de tener un componente Layout como contenido.
 
-Al depender del proveedor de rutas, se debe envolver el componente a testar en un `MemoryRouter`:
+Para testar App basta con comprobar que llama a los componente Header y Footer. No es necesaria ninguna indicación de la existencia del `Outlet`, o de cualquier otro elemento del enrutamiento
 
 ```tsx
 import { render } from '@testing-library/react';
@@ -86,11 +112,7 @@ vi.mock('./core/components/footer/footer');
 
 describe('App component', () => {
   test('should call components Header and Footer', () => {
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>,
-    );
+    render(<App />);
     expect(Header).toHaveBeenCalled();
     expect(Footer).toHaveBeenCalled();
   });
@@ -99,259 +121,85 @@ describe('App component', () => {
 
 Lo que testamos es que es capaz de llamar a los componentes `Header` y `Footer`, que son parte del layout de la aplicación.
 
-### Fichero de rutas
+#### Test de las rutas
 
-Para evitar que el fichero `App.tsx` crezca, se pueden definir las rutas en un fichero separado:
-
-```tsx
-import { Home } from '../../features/home/home';
-import { About } from '../../features/about/about';
-import { Route, Routes } from 'react-router';
-export const AppRoutes: React.FC = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="*" element={<div>404 Not Found</div>} />
-    </Routes>
-  );
-};
-```
-
-Luego se importa en el fichero `App.tsx` como un componente más.
-
-#### Test de rutas
-
-Para testar las rutas, se puede hacer de forma similar al test de `App.tsx`, envolviendo el componente en un `MemoryRouter`:
-(Opcionalmente en el test de App podemos crear un mock del componente `AppRoutes` y eliminar el proveedor de rutas)
+Para testar las rutas, se puede hacer de forma similar al test de `AppRoutes.tsx`, empleando en lugar de un `MemoryRouter` un `createMemoryRouter`, que recibirá como parametros el array de rutas y un objeto con la ruta activa de cada caso de test:
 
 ```tsx
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
-import { AppRoutes } from './app-routes';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { Home } from '../../features/home/home';
 import { About } from '../../features/about/about';
+import { Products } from '../../features/products/products';
 
 vi.mock('../../features/home/home');
 vi.mock('../../features/about/about');
 
 describe('App component', () => {
   test('should render info for invalid routes', () => {
-    render(
-      <MemoryRouter initialEntries={['/invalid-route']}>
-        <AppRoutes />
-      </MemoryRouter>,
-    );
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/invalid-route'],
+    });
+    render(<RouterProvider router={router} />);
+
     const element = screen.getByText('404 Not Found');
     expect(element).toBeInTheDocument();
   });
 
-  test('should route to home page', () => {
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <AppRoutes />
-      </MemoryRouter>,
-    );
+  test('should route to home page', async () => {
+    const router = createMemoryRouter(appRoutes, { initialEntries: ['/'] });
+    render(<RouterProvider router={router} />);
     expect(Home).toHaveBeenCalled();
   });
-  test('should route to about page', () => {
-    render(
-      <MemoryRouter initialEntries={['/about']}>
-        <AppRoutes />
-      </MemoryRouter>,
-    );
-
+  test('should route to about page', async () => {
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/about'],
+    });
+    render(<RouterProvider router={router} />);
     expect(About).toHaveBeenCalled();
   });
 });
 ```
 
-### Rutas anidadas
+### Carga diferida (Lazy loading) de las páginas
 
-Las mismas rutas se pueden definir de forma anidada, creando un nuevo componente Layout que se encargue de renderizar las rutas hijas.
+Se basa en la existencia en el estándar de JS de la posibilidad de importar **módulos** de forma **asíncrona**, utilizando la función `import()`.
 
-#### Componente Layout
+Para implementar el lazy loading en las rutas de React Router, se puede utilizar la función `lazy` de React, que permite cargar componentes de forma diferida. Para facilitar esta operación es conveniente que los componentes que se vayan a cargar de forma diferida estén exportados de forma `default`.
 
 ```tsx
-type Props = {
-  children: JSX.Element;
-  title: string;
-};
-export const Layout: React.FC<Props> = ({ title, children }) => {
-  return (
-    <>
-      <Header title={title} />
-      <main className="main">{children}</main>
-      <Footer />
-    </>
-  );
-};
+const Home = React.lazy(() => import('../../features/home/home'));
+const Products = React.lazy(() => import('../../features/products/products'));
+const ProductDetail = React.lazy(
+  () => import('../../features/products/pages/product-detail'),
+);
+const About = React.lazy(() => import('../../features/about/about'));
 ```
 
-#### Test del componente Layout
+De esta forma no es necesaria ninguna modificación en el array de rutas.
 
-Recupera en parte el que antes era test de App, ya que ahora es el Layout quien monta Header y Footer
+Una alternativa es usar la propiedad lazy de los objetos de las rutas, que permite definir el componente a cargar de forma diferida:
 
 ```tsx
-vi.mock('../header/header');
-vi.mock('../footer/footer');
-
-describe('Layout component', () => {
-  beforeEach(() => {
-    render(
-      <MemoryRouter>
-        <Layout title="Demo 06">
-          <div>Test Content</div>
-        </Layout>
-      </MemoryRouter>,
-    );
-  });
-
-  test('should render children content', () => {
-    const content = document.querySelector('.main');
-    expect(content).toBeInTheDocument();
-    expect(content?.textContent).toBe('Test Content');
-  });
-
-  test('should call components Header and Footer', () => {
-    expect(Header).toHaveBeenCalled();
-    expect(Footer).toHaveBeenCalled();
-  });
-});
+{
+  path: 'about',
+  lazy: {
+      Component: async () =>
+          (await import('../../features/about/about')).About,
+  },
+},
 ```
 
-#### Componente App
+#### Test de las rutas con carga diferida
 
-El componente `App` ahora utiliza el componente `Layout` para envolver las rutas:
-
-```tsx
-export const App: React.FC = () => {
-  const title = import.meta.env.VITE_APP_TITLE || 'Demo 06 - Routes';
-
-  return (
-    <>
-      <Layout title={title}>
-        <AppRoutes />
-      </Layout>
-    </>
-  );
-};
-```
-
-Siguiendo la forma de hacer los tests, el test de `App` se puede simplificar, ya que no es necesario comprobar que se llaman a los componentes `Header` y `Footer`, ya que ahora son parte del `Layout`.
+El único cambio en loa test de las rutas es que se debe usar waitFor para esperar a que se resuelva la carga del componente diferido:
 
 ```tsx
-vi.mock('../layout/layout', () => ({
-  Layout: vi.fn(({ children }) => <div>{children}</div>),
-}));
-vi.mock('../../routes/app-routes');
-
-describe('App component', () => {
-  test('should call components Header and Footer', () => {
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>,
-    );
-    expect(AppRoutes).toHaveBeenCalled();
-    expect(Layout).toHaveBeenCalled();
-  });
-});
-```
-
-En este caso, el mock del layout tiene que implementarse para que reciba los hijos, ya que el componente `App` los pasa como tal.
-
-#### Rutas Anidadas
-
-El componente Layout, puede integrarse en las rutas y anidar las rutas hijas. Para ello se sustituye el children por un elemento `Outlet` de React Router, que se encargará de renderizar las rutas hijas.
-
-```tsx
-type Props = {
-  title?: string;
-};
-export const Layout: React.FC<Props> = ({ title = '' }) => {
-  return (
-    <>
-      <Header title={title} />
-      <main className="main">
-        {/* This is where the child components will be rendered */}
-        <Outlet />
-      </main>
-      <Footer />
-    </>
-  );
-};
-```
-
-Su test tanbién se simplifica al no necesitar comprobar que se renderizan los hijos, ya que el `Outlet` se encargará de ello:
-
-```tsx
-vi.mock('../header/header');
-vi.mock('../footer/footer');
-
-describe('Layout component', () => {
-  beforeEach(() => {
-    render(
-      <MemoryRouter>
-        <Layout title="Demo 06"></Layout>
-      </MemoryRouter>,
-    );
-  });
-
-  test('should call components Header and Footer', () => {
-    expect(Header).toHaveBeenCalled();
-    expect(Footer).toHaveBeenCalled();
-  });
-});
-```
-
-Las rutas en el componente AppRoutes quedarían de la siguiente forma:
-
-```tsx
-type Props = {
-  title?: string;
-};
-export const AppRoutes: React.FC<Props> = ({ title }) => {
-  return (
-    <Routes>
-      <Route path="/" element={<Layout title={title} />}>
-        <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="*" element={<div>404 Not Found</div>} />
-      </Route>
-    </Routes>
-  );
-};
-```
-
-Y el componente `App` solo cargaría las rutas, con lo que quedaría así:
-
-```tsx
-import { AppRoutes } from './routes/app-routes';
-export const App: React.FC = () => {
-  const title = import.meta.env.VITE_APP_TITLE || 'Demo 06 - Routes';
-
-  return (
-    <>
-      <AppRoutes title={title} />
-    </>
-  );
-};
-```
-
-Igualmente se simplificaría su test que solo necesita comprobar que llama al componente `AppRoutes`:
-
-```tsx
-vi.mock('../../routes/app-routes');
-
-describe('App component', () => {
-  test('should call components Header and Footer', () => {
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>,
-    );
-    expect(AppRoutes).toHaveBeenCalled();
+test('should route to home page', async () => {
+  const router = createMemoryRouter(appRoutes, { initialEntries: ['/'] });
+  render(<RouterProvider router={router} />);
+  await waitFor(() => {
+    expect(Home).toHaveBeenCalled();
   });
 });
 ```
@@ -471,7 +319,7 @@ Ahora, al hacer clic en un enlace del menú, la navegación se realiza sin recar
 
 #### Test funcional del menú
 
-Para testear de forma unitaria el menu SPA necesitamos comprobar que el Link responde cuando hacemos click, sinnecesidad de que se cargue realmente ninguna ruta.
+Para testear de forma unitaria el menu SPA necesitamos comprobar que el Link responde cuando hacemos click, sin necesidad de que se cargue realmente ninguna ruta.
 
 Para ello, podemos utilizar el objeto history del navegador, pero el problema es que MemoryRouter no modifica la URL del navegador real (window.location), ya que funciona completamente en memoria y React Router no expone el estado de location fuera de su contexto.
 
@@ -540,6 +388,8 @@ Y lo mismo para cada una de las rutas,
 
 ### Rutas dinámicas
 
+#### Products: carga de datos en la ruta
+
 Para utilizar rutas dinámicas creamos la feature Products
 
 - La entidad correspondiente
@@ -548,7 +398,9 @@ Para utilizar rutas dinámicas creamos la feature Products
 - Un componente Products que renderiza una lista de productos
 - Un componente Product que renderiza un producto por id
 
-En al componente `Products` cada item tiene un link con una ruta diáminca:
+#### Rutas a los detalles de un producto
+
+En al componente `Products` cada item tiene un link con una ruta dinámica:
 
 - parte fija: `/products/`
 - segmento dinámica: el id de cada producto, que será identificado como `:id`
@@ -575,6 +427,8 @@ En las rutas se incluye una nueva, con el patron dinámico `/product/:id`:
   </Route>
 </Routes>
 ```
+
+#### Componente ProductDetail
 
 El componente `ProductDetail` recupera el id de la ruta y el resto de sus datos del servicio, para poder mostrar el producto correspondiente:
 
@@ -662,57 +516,3 @@ Por último se testa que el botón de volver al inicio navega a la ruta `/`:
 ```
 
 En este caso es sencillo porque, a diferencia del Link, la función `navigate` del hook `useNavigate` si modifica el objeto `history` del navegador, por lo que podemos comprobar que la ruta ha cambiado correctamente.
-
-### Carga diferida (Lazy loading) de las páginas
-
-Se basa en la existencia en el estándar de JS de la posibilidad de importar **módulos** de forma **asíncrona**, utilizando la función `import()`.
-
-Para implementar el lazy loading en las rutas de React Router, se puede utilizar la función `lazy` de React, que permite cargar componentes de forma diferida. Para facilitar esta operación es conveniente que los componentes que se vayan a cargar de forma diferida estén exportados de forma `default`.
-
-```tsx
-const Home = React.lazy(() => import('../../features/home/home'));
-const Products = React.lazy(() => import('../../features/products/products'));
-const ProductDetail = React.lazy(
-  () => import('../../features/products/pages/product-detail'),
-);
-const About = React.lazy(() => import('../../features/about/about'));
-```
-
-Para ello, se importa el componente de forma diferida utilizando `React.lazy` y se envuelve en un `Suspense` para manejar el estado de carga.
-
-```tsx
-<Route
-  index
-  element={
-    <React.Suspense>
-      <Home />
-    </React.Suspense>
-  }
-/>
-```
-
-Y así con cada una de las rutas que se vayan a cargar de forma diferida.
-
-Para que el componente `Suspense` muestre algo mientras se carga el componente, se le puede pasar una prop `fallback` con un elemento que se mostrará durante la carga:
-
-```tsx
-<React.Suspense fallback={<div>Loading...</div>}>
-  <Home />
-```
-
-#### Test de las rutas con carga diferida
-
-El único cambio en loa test de las rutas es que se debe usar waitFor para esperar a que se resuelva la carga del componente diferido:
-
-```tsx
-test('should route to home page', async () => {
-  render(
-    <MemoryRouter initialEntries={['/']}>
-      <AppRoutes />
-    </MemoryRouter>,
-  );
-  await waitFor(() => {
-    expect(Home).toHaveBeenCalled();
-  });
-});
-```
