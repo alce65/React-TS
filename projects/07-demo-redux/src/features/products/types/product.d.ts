@@ -9,3 +9,5 @@ export type Product = {
     category?: string;
     stock?: number;
 };
+
+export type ProductDTO = Omit<Product, 'id'>;
