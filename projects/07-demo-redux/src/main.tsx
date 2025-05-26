@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { appRoutes } from './core/routes/routes.ts';
 import './index.css';
+import { Provider } from 'react-redux';
+import { store } from './store/index.ts';
 // import { App } from './core/components/app/App.tsx';
 
 // createRoot(document.getElementById('root') as HTMLDivElement).render(
@@ -19,6 +21,8 @@ if (!root) {
 const router = createBrowserRouter(appRoutes);
 createRoot(root).render(
     <StrictMode>
-        <RouterProvider router={router} />
+        <Provider store={store}>
+            <RouterProvider router={router} />
+        </Provider>
     </StrictMode>,
 );

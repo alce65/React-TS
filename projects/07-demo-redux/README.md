@@ -2,7 +2,8 @@
 
 Proyecto con React, TypeScript y Vite.
 Reubicado y modificado el ejemplo inicial.
-Dependencias añadidas: vitest, jsdom y testing-library/react.
+Dependencias añadidas: vitest, jsdom y testing-library/react
+junto con react-router y redux-toolkit
 
 ## Initial project
 
@@ -81,7 +82,15 @@ setupFiles: ['./testConfig.ts'];
 Se instala [React Router](https://reactrouter.com/home), la evolución del react-router-dom usado habitualmente en los proyectos de React.
 
 ```shell
-npm install react-router
+npm i react-router
 ```
 
 En package.json aparece la dependencia `"react-router": "^7.6.0"`
+
+### Install Redux Toolkit
+
+Se instala [Redux Toolkit](https://redux-toolkit.js.org/), la forma recomendada de escribir lógica de Redux.
+
+```shell
+npm i @reduxjs/toolkit react-redux
+```
