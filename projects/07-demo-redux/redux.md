@@ -276,6 +276,93 @@ Para despachar acciones desde un componente, puedes usar el hook `useDispatch` d
 
 Para centralizar todo el dispatch de acciones, podemos crear un hook personalizado `useProducts` que nos permita además encapsular las llamadas a la API y manejar los efectos secundarios.
 
-Respecto a las primeras, comenzaremos por encapsularlas en un servicio que se encargue de interactuar con la API. Por ejemplo, podemos crear un archivo `apiRepoService.ts`: 
+### Repositorio y Contexto
+
+Respecto a las primeras, comenzaremos por encapsularlas en un servicio que se encargue de interactuar con la API. Por ejemplo, podemos crear un interface `ProductRepository` con implementaciones comm `InMemoryProductsRepoService` o `ApiProductsRepoService.ts`:
 
 ```tsx
+import type { Product, ProductDTO } from '../../types/product';
+
+export interface ProductRepository {
+  getProducts(): Promise<Product[]>;
+  getProductById(id: Product['id']): Promise<Product>;
+  createProduct(user: ProductDTO): Promise<Product>;
+  updateProduct(
+    id: Product['id'],
+    product: Partial<ProductDTO>,
+  ): Promise<Product>;
+  deleteProduct(id: Product['id']): Promise<void>;
+}
+```
+
+Para conseguir una inyección de dependencia que siempre proporcione la misma instancia del repositorio, podemos usar un contexto de React. Creamos un contexto `AppContext` y un proveedor `AppContextProvider` que se encargue de proporcionar la instancia del repositorio a los componentes que lo necesiten
+
+```ts
+import React, { createContext, useContext } from 'react';
+import type { ProductRepository } from './ProductRepository';
+
+type Context = {
+  title: string;
+  repo: ProductRepository;
+};
+
+const defaultContext: Context = {} as Context;
+
+const AppContext = createContext<Context>(defaultContext);
+```
+
+El provider del contexto es un componente de React recibe por props el repositorio y el titulo de la app y los proporciona (inyecta) a través del contexto:
+
+```tsx
+type Props = {
+  children: React.ReactNode;
+  title: string;
+  repo: ProductRepository;
+};
+
+export const AppContextProvider: React.FC<Props> = ({
+  children,
+  repo,
+  title,
+}) => {
+  return (
+    <AppContext.Provider value={{ title, repo }}>
+      {children}
+    </AppContext.Provider>
+  );
+};
+```
+
+Luego, en el archivo principal de tu aplicación, puedes envolver tu aplicación con el `AppContextProvider`, pasándole la instancia del repositorio y el título de la aplicación:
+
+```tsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import { AppContextProvider } from './context/AppContext';
+import { ApiProductsRepoService } from './services/ApiProductsRepoService';
+import App from './App';
+
+const repo = new InMemoryProductRepository();
+const title = import.meta.env.VITE_APP_TITLE || 'Demo 07';
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <AppContextProvider repo={repo} title={title}>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </AppContextProvider>
+  </React.StrictMode>,
+);
+```
+
+Ahora, en cualquier componente de la aplicación, se puede acceder al repositorio y al resto del contexto utilizando el API `use`:
+
+```tsx
+export const Header: React.FC<Props> = ({ children }) => {
+    const { title } = use(AppContext) || 'Demo';
+    ...
+}
+```

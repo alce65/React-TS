@@ -5,11 +5,11 @@ import { Outlet } from 'react-router';
 import { Menu } from '../menu/menu';
 
 export const App: React.FC = () => {
-    const title = import.meta.env.VITE_APP_TITLE || 'Demo 07';
+
 
     return (
         <>
-            <Header title={title}>
+            <Header>
                 <Menu />
             </Header>
             <main className="main">

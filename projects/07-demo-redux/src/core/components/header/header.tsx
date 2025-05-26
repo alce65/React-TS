@@ -1,11 +1,13 @@
+import { use } from 'react';
 import reactLogo from '../../../assets/react.svg';
 import './header.css';
+import { AppContext } from '../../../context/app.context';
 
 type Props = {
-    title?: string;
     children?: React.ReactNode;
 };
-export const Header: React.FC<Props> = ({ title = 'Demo', children }) => {
+export const Header: React.FC<Props> = ({ children }) => {
+    const { title } = use(AppContext) || 'Demo';
     return (
         <header className="header">
             <div className="header-main">
