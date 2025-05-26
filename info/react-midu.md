@@ -37,7 +37,7 @@ repo: "https://github.com/midudev/aprendiendo-react"
 
 - Mono-repositorio multi-paquete
 - Se crea la carpeta contenedora y se ejecuta el comando `npm init -y`
-- Dentro se crea la carpeta `projects` y 
+- Dentro se crea la carpeta `projects` y
 - Dentro de ella se ejecuta  `npm create vite@latest` para crear el proyecto
 - Se elige la plantilla de React y la de JS-SWC
 
@@ -208,7 +208,7 @@ repo: "https://github.com/midudev/aprendiendo-react"
 59:15 - Crear componente Route
 01:08:15 - Lazy Load de las rutas
 01:19:50 - Cómo hacer internacionalización
-01:23:00 - Testeando nuestro paquete de Router
+01:23:00 - Testando nuestro paquete de Router
 01:43:20 - Preparando para hacerlo como paquete publicable
 01:51:22 - Iniciar sesión en npm y publicar paquete
 01:55:30 - Probando nuestro paquete de Router en otro proyecto
@@ -218,6 +218,43 @@ repo: "https://github.com/midudev/aprendiendo-react"
 ## 9 Crear un Google Translate con ChatGPT y TypeScript
 
 ## 10 Crear un CRUD con Redux Toolkit y TypeScript
+
+0:00 Introducción
+1:35 ¿Qué es Redux?
+4:31 Instalar Vite
+5:19 Rome Tools en vez del Linter
+7:06 Instalar Rome Tools y configuración
+12:10 Qué es Tremor, instalación y configuración
+15:25 npm run dev
+16:44 Creando una tabla de Tremor
+20:30 Renderizando nuestra tabla
+22:27 Agregando Iconos a las “Acciones”
+24:28 Agregando Redux al proyecto
+26:25 Store + Configuración
+28:53 Explicación de Redux
+29:24 Slice
+33:32 Qué es el reducer
+36:29 Leer La Store
+38:57 Arreglando el problema de TypeScript
+41:37 Custom Hooks
+46:14 Creando Acciones
+46:24 Eliminar Usuarios
+49:12 Cosas a tener en cuenta
+50:35 Forma Típica (no recomendada)
+54:23 Forma recomendada
+56:36 Pregunta de persona / Scramming Architecture
+58:53 Fin de la pregunta
+58:58 Middleware Persistencia de datos
+01:05:28 Cambiando el InitialState
+1:10:00 Componente CreateNewUser, Acción para agregar Usuarios
+1:21:00 Manejo de Errores
+1:21:28 Estado Local
+1:25:05 Diferencia entre Context y Redux
+1:26:12 Sincronizar con Bases de Datos Middleware + Actualización Optimista
+1:28:57 Sonner - Notificaciones al Delete
+1:40:17 RollBack - Borrando Usuario
+1:47:42 Mutaciones con Immer
+1:54:24 Tarea en casa
 
 ## 11 Prueba Técnica con TypeScript y React
 
