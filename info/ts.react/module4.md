@@ -282,6 +282,54 @@ Algunas configuraciones útiles en React:
 
 - `baseUrl` y `paths` permiten alias de importación.
 
+Por ejemplo, para facilitar el acceso a componentes, hooks y tipos, se pueden definir alias como `@components`, `@hooks`, `@types`, etc.
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@hooks/*": ["hooks/*"],
+      "@types/*": ["types/*"]
+    }
+  }
+}
+```
+
+Al utilizar vite es necesario actualizar el archivo `vite.config.ts` para que reconozca estos alias:
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@components': 'src/components',
+      '@hooks': 'src/hooks',
+      '@types': 'src/types',
+    },
+  },
+});
+```
+
+Ya no es imprescindible utilizar path para definir los alias, pero es una buena práctica para evitar problemas de resolución de rutas.
+
+```ts
+"@components": path.resolve(__dirname, "src/components")
+```
+
+Con esta configuración, se pueden importar componentes, hooks y tipos de la siguiente manera:
+
+```tsx
+// components/UserCard.tsx
+import { User } from '@types/user';
+import { Button } from '@components/Button';
+```
+
 Las ventajas del uso de alias son:
 
 - Mejora la claridad de los imports.
