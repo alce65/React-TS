@@ -85,3 +85,7 @@ npm install react-router
 ```
 
 En package.json aparece la dependencia `"react-router": "^7.6.0"`
+
+## Content
+
+Demos del Módulo 4 del curso de TS medio con React -> routes (v.1)
