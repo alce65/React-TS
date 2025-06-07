@@ -1,24 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link, useLoaderData } from 'react-router';
-import type { Product } from './types/product.d';
-import repo from './services/products.service';
+import { useEffect } from 'react';
+import { Link } from 'react-router';
 import './products.css';
+import { useProducts } from './hooks/use-products';
 
 export const Products: React.FC = () => {
-    const loadedProducts = useLoaderData<Product[]>();
-    const [products, setProducts] = useState<Product[]>(loadedProducts || []);
-
-    const loadData = useCallback(async (): Promise<void> => {
-        console.log('useCallback ejecuta loadData');
-        const data = await repo.getAllProducts();
-        setProducts(() => data);
-    }, []);
-
+    const { products, loadProducts } = useProducts();
     useEffect(() => {
         if (products.length !== 0) return;
         console.log('useEffect ejecuta loadData');
-        loadData();
-    }, [loadData, products.length]);
+        loadProducts();
+    }, [loadProducts, products.length]);
 
     return (
         <section className="products">

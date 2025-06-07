@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react';
-import './product-detail.css';
-import { useLoaderData, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import type { Product, UUID } from '../types/product';
-import repo from '../services/products.service';
+import { useProducts } from '../hooks/use-products';
+import './product-detail.css';
 
 export const ProductDetail: React.FC = () => {
     const { id } = useParams<{ id: UUID }>();
-    const loadedProduct = useLoaderData<Product>();
     const navigate = useNavigate();
-    const [product, setProduct] = useState<Product | null>(loadedProduct);
+    const { products, getProductById } = useProducts();
+    const [product, setProduct] = useState<Product | null>(
+        products.find((p) => p.id === id) || null,
+    );
+
     useEffect(() => {
-        if (loadedProduct.id === id) return;
+        if (product?.id === id) return;
         const loadData = async (id: UUID): Promise<void> => {
             console.log('Loading product data for ID:', id);
-            // Simulate fetching product data
-            const fetchedProduct: Product = await repo.getProductById(id);
+            const fetchedProduct: Product = await getProductById(id);
             setProduct(() => fetchedProduct);
         };
         loadData(id as UUID);
-    }, [id, loadedProduct]);
+    }, [id, getProductById, product?.id]);
 
     const handleClick = (): void => {
         console.log('Button clicked, navigating to home');
