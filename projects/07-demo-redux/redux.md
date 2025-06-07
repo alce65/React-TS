@@ -1,5 +1,19 @@
 # Redux
 
+- [Redux](#redux)
+  - [Store](#store)
+  - [Provider](#provider)
+  - [Slice](#slice)
+  - [Integración del slice en el store y acceso a los datos](#integración-del-slice-en-el-store-y-acceso-a-los-datos)
+  - [Acciones y Reducers](#acciones-y-reducers)
+    - [Test del reducer](#test-del-reducer)
+  - [Dispatch de acciones](#dispatch-de-acciones)
+    - [Repositorio y Contexto](#repositorio-y-contexto)
+    - [Hook useProducts](#hook-useproducts)
+    - [Componente Products](#componente-products)
+    - [Componente DetailProducts](#componente-detailproducts)
+    - [Loaders en las rutas](#loaders-en-las-rutas)
+
 Redux Toolkit es la herramienta oficial para trabajar con Redux, que simplifica la creación de store y reducers, y proporciona utilidades para manejar acciones y efectos secundarios.
 
 ```shell
@@ -366,3 +380,58 @@ export const Header: React.FC<Props> = ({ children }) => {
     ...
 }
 ```
+
+### Hook useProducts
+
+Para encapsular la lógica de negocio relacionada con los productos, podemos crear un hook personalizado `useProducts`. Este hook utilizará el repositorio inyectado desde el contexto para realizar operaciones CRUD y despachar acciones al store de Redux.
+
+```tsx
+const { repo } = use(AppContext);
+    const { products } = useAppSelector((state) => state.products);
+    const dispatch = useAppDispatch();
+
+    const loadProducts = async (): Promise<void> => {
+        const products = await repo.getProducts();
+        dispatch(ac.setProducts(products));
+    };
+
+    const getProductById = async (
+        id: Product['id'],
+    ): Promise<Product> => {
+        const product = await repo.getProductById(id);
+        return product;
+    };
+
+    const addProduct = async (productData: ProductDTO): Promise<void> => {
+        const newProduct = await repo.createProduct(productData);
+        dispatch(ac.addProduct(newProduct));
+    };
+    const updateProduct = async (
+        id: Product['id'],
+        productData: ProductDTO,
+    ): Promise<void> => {
+        const updatedProduct = await repo.updateProduct(id, productData);
+        dispatch(ac.updateProduct(updatedProduct));
+    };
+    const deleteProduct = async (id: Product['id']): Promise<void> => {
+        await repo.deleteProduct(id);
+        dispatch(ac.deleteProduct(id));
+    };
+
+
+    return {
+        products,
+        loadProducts,
+        getProductById,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+    };
+};
+```
+
+### Componente Products
+
+### Componente DetailProducts
+
+### Loaders en las rutas
