@@ -1,8 +1,10 @@
 import { type JSX, useState } from 'react';
 
-export const FormComponent = (): JSX.Element => {
+export const SimpleFormComponent = (): JSX.Element => {
     const [value, setValue] = useState<string>('');
 
+    // tipado alternativo
+    // const handleChange: React.ChangeEventHandler<HTMLInputElement>
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         // (property) React.ChangeEvent<HTMLInputElement>.target:
         // EventTarget & HTMLInputElement
@@ -10,6 +12,8 @@ export const FormComponent = (): JSX.Element => {
         setValue(element.value);
     };
 
+    // tipado alternativo
+    // const handleSubmit: React.FormEventHandler<HTMLFormElement>
     const handleSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
         console.log('Form submitted with value:', value);
@@ -32,7 +36,7 @@ type FormErrors = {
     email?: string;
 };
 
-export const FormComponent2 = (): JSX.Element => {
+export const FormComponent = (): JSX.Element => {
     const [formData, setFormData] = useState<FormData>({
         name: '',
         email: '',

@@ -11,6 +11,7 @@ module: 1
     - [El tipo any](#el-tipo-any)
     - [Variables y tipos explícitos (type annotations)](#variables-y-tipos-explícitos-type-annotations)
     - [📘 Uso de tipos inferidos y explícitos en funciones React](#-uso-de-tipos-inferidos-y-explícitos-en-funciones-react)
+      - [Uso de tipos propios de React](#uso-de-tipos-propios-de-react)
       - [⚙️ Tipado del retorno de las funciones obligatorio](#️-tipado-del-retorno-de-las-funciones-obligatorio)
   - [🧠 Tipos propios (custom Types)](#-tipos-propios-custom-types)
     - [Alias de tipos (type aliases)](#alias-de-tipos-type-aliases)
@@ -69,25 +70,25 @@ Los resultados inmediatos del uso de TypeScript son la **inferencia de tipos** y
 
 Respecto a lo primero, TypeScript puede **inferir el tipo** de una **variable** basándose en el valor asignado.
 
-```ts
+```ts sample0.basic.ts
 let x = 10; // x: number
 ```
 
 Sin necesidad de especificar el tipo de la variable `x`, TypeScript es capaz de inferir que `x` es de tipo `number`.
 Además, en el propio editor de código, TypeScript mostrará un error si se intenta asignar un valor de tipo distinto al inferido.
 
-```ts
+```ts sample0.basic.ts
 let x = 10;
-x = "Hola"; // Error: Type 'string' is not assignable to type 'number'
+x = 'Hola'; // Error: Type 'string' is not assignable to type 'number'
 ```
 
 Para los valores primitivos, los tipos inferidos son los mismos siete tipos primitivos de JavaScript: `number`, `string`, `boolean`, `null`, `undefined`, `symbol` y `bigint`.
 
 Para los objetos, TypeScript infiere el tipo de la variable a partir de la estructura del objeto.
 
-```ts
+```ts sample0.basic.ts
 let user = {
-  name: "John",
+  name: 'John',
   age: 30,
 };
 // user: { name: string; age: number }
@@ -95,7 +96,7 @@ let user = {
 
 Es importante aprovechar la inferencia de tipos y no usar anotaciones innecesarias. Aunque depende del conjunto de reglas activo, es habitual que el linter nos alerte en caso de usar anotaciones innecesarias.
 
-```ts
+```ts sample0.basic.ts
 let state: boolean = false;
 
 // Type boolean trivially inferred from a boolean literal, remove type annotation.
@@ -107,14 +108,14 @@ let state: boolean = false;
 
 Hay que considerar la diferencia entre las declaraciones `let` y `const`, dando esta segunda lugar a los **tipos literales** (literal types). Esto se debe a que TypeScript trata de hacer siempre la inferencia lo más específica posible.
 
-```ts
+```ts sample0.basic.ts
 let x = 10; // x: number
 const y = 20; // y: 20
 ```
 
 En caso de `let` es posible forzar un tipo literal una conversión de tipo (type casting), de las que luego hablaremos. Por ejemplo, si se quiere que `x` sea un número 10, se puede hacer lo siguiente:
 
-```ts
+```ts sample0.basic.ts
 let x = 10 as const; // x: 10
 ```
 
@@ -122,17 +123,17 @@ let x = 10 as const; // x: 10
 
 El tipo `any` **implícito** aparece cuando TypeScript no puede inferir el tipo de una variable. Es un tipo que **no** proporciona **ninguna** información sobre el valor de la variable.
 
-```ts
+```ts sample0.basic.ts
 let x; // x: any
 x = 10; // x: any
-x = "Hola"; // x: any
+x = 'Hola'; // x: any
 ```
 
 #### Variables y tipos explícitos (type annotations)
 
 En caso de un any implícitos, entre otros, es conveniente usar **anotaciones de tipos** (type annotations), para proporcionar (anotar) tipos **explícitos** a las variables.
 
-```ts
+```ts sample0.basic.ts
 let x;
 x = 10; // x: any;
 let y: number; // anotación de tipo
@@ -141,19 +142,28 @@ y = 12; // y: number
 
 Las anotaciones son especialmente importantes, en el caso de los **parámetros** y **valores de retorno** de las **funciones**.
 
+```ts sample0.basic.ts
+function greet(name: string): string {
+  return `Hello, ${name}!`;
+}
+
+greet('John'); // Correcto
+greet(42); // Error: Argument of type 'number' is not assignable to parameter of type 'string'.
+```
+
 #### 📘 Uso de tipos inferidos y explícitos en funciones React
 
 Como hemos visto, TypeScript infiere tipos automáticamente, cuando las variables se declaran con un valor inicial. Esto solo se aplica a los parámetros de las funciones cuando tienen un valor por defecto.
 
-```tsx
-const handleClick = (event = new MouseEvent("click")) => {
+```tsx sample0.button.tsx
+const handleClick = (event = new MouseEvent('click')) => {
   console.log(event);
 };
 ```
 
 En caso de no tener un valor por defecto, TypeScript no puede inferir el tipo del parámetro `event`, ya que podría ser cualquier cosa. Por lo tanto, el tipo de `event` es `any`.
 
-```tsx
+```tsx sample0.button.tsx
 const handleClick = (event) => {
   console.log(event);
 };
@@ -161,11 +171,45 @@ const handleClick = (event) => {
 
 Para evitar esto, es imprescindible usar una **anotación de tipo** explícita para el parámetro `event`, como `SyntheticEvent` o `React.MouseEvent` .
 
-```tsx
+```tsx sample0.button.tsx
 const handleClick = (event: React.MouseEvent) => {
   console.log(event);
 };
 ```
+
+##### Uso de tipos propios de React
+
+Cuando asignamos un manejador de evento a un componente de React, como `onClick`, `onChange`, etc., podemos ver que React utiliza sus propios tipos para los elementos de HTML y las funciones manejadoras de eventos.
+
+```tsx sample0.button.tsx
+<button onClick={handleClick}>Hacer clic</button>
+```
+
+Intellisense nos muestra que el tipo del button es `JSX.IntrinsicElements.button`, que es un tipo genérico que representa un elemento HTML de tipo botón. Este tipo se define en el namespace de React, y se puede usar para tipar los elementos de HTML en React.
+
+En cuanto a los eventos, React utiliza tipos específicos para cada tipo de evento y para su correspondiente handler. Por ejemplo, el atributo `onClick` pertenece al tipo `React.DOMAttributes<HTMLButtonElement>` y espera como valor una función manejadora de eventos del tipo es `React.MouseEventHAndler<HTMLButtonElement>`.
+
+Si creamos una función aparte para asignarla a esta propiedad podemos definirla con el tipo qwe nos proporciona React
+
+```tsx sample0.button.tsx
+const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+  console.log(event);
+};
+```
+
+De este modo estaremos tipando el parámetro `event` como un evento de tipo `MouseEvent`, que es un tipo específico de evento de ratón en React y la función como void, sin indicarlo explícitamente como vemos a continuación.
+
+```tsx sample0.button.tsx
+const handleClick = (
+  event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+): void => {
+  console.log(event);
+};
+```
+
+Estos tipos son específicos de React y permiten a TypeScript inferir el tipo del evento correctamente.
+
+##### ⚙️ Tipado del retorno de las funciones obligatorio
 
 En el caso de las funciones es posible usar anotaciones de tipo explícitas, tanto en sus parámetros como en su valor de retorno.
 El tipado del retorno de las funciones, aunque es opcional, pero mejora **la legibilidad** del código y puede ayudar a **detectar errores** pronto, en la propia función, en lugar de al usarla. Se profundizará en ello más adelante.
@@ -173,7 +217,7 @@ El tipado del retorno de las funciones, aunque es opcional, pero mejora **la leg
 ```tsx
 // Inferido
 const handleClick = () => {
-  console.log("clicked");
+  console.log('clicked');
 };
 
 // Explícito
@@ -181,8 +225,6 @@ const handleMultiply = (a: number, b: number): number => {
   return a * b;
 };
 ```
-
-##### ⚙️ Tipado del retorno de las funciones obligatorio
 
 El tipado del retorno de las funciones es una buena práctica, especialmente útil en funciones complejas, donde la inferencia puede no ser suficiente o clara. Para hacer **obligatorio el tipado del retorno de las funciones**, se pueden usar dos mecanismos:
 
@@ -217,9 +259,9 @@ Existen dos mecanismos en TypeScript para dar nombre a nuevos tipos, denominados
 
 Los alias de tipos permiten dar nombre a un tipo y reutilizarlo en diferentes partes del código. Se definen con el operador `type` y se pueden utilizar para definir con un nombre cualquiera de los tipos que existen en TypeScript, como los tipos de objetos, tipos de tuplas, tipos de unión y tipos de intersección que ya conocemos.
 
-```ts
+```ts sample0.types.1.ts
 type User = { name: string; age: number };
-type Tuple: readonly [string, number];
+type Tuple = readonly [string, number];
 type Success = { status: 'success'; data: string[] };
 type Fail = { status: 'error'; error: Error };
 type Response = Success | Fail;
@@ -227,7 +269,7 @@ type Response = Success | Fail;
 
 Igualmente se pueden usar alias de tipos para definir tipos de funciones, que se pueden reutilizar en diferentes partes del código.
 
-```ts
+```ts sample0.types.1.ts
 type Callback = (a: number, b: number) => number;
 const add: Callback = (a, b) => a + b;
 const multiply: Callback = (a, b) => a * b;
@@ -237,11 +279,11 @@ Al dar nombres a tipos, se pueden **simplificar definiciones** de tipos complejo
 
 A diferencia de lo que ocurre con las interfaces, también se pueden usar alias de tipos para renombrar tipos **primitivos** y tipos **literales** o conjunto de cualquiera de ellos, creados mediante uniones o intersecciones.
 
-```ts
+```ts sample0.types.1.ts
 type Name = string;
 type Age = number;
 type ID = string | number;
-type Status = "success" | "error";
+type Status = 'success' | 'error';
 type Firsts = 1 | 2 | 3 | 4 | 5;
 type Events = 2 | 4 | 6 | 8;
 ```
@@ -252,7 +294,7 @@ En estos casos destaca especialmente el valor semántico de los alias de tipos, 
 
 Las interfaces son otra forma de dar un nombre a un tipo, pero no a cualquier tipo de TypeScript, no pudiendo usarse con tipos primitivos o sus literales. Se definen con la palabra clave `interface` y se pueden utilizar para definir tipos de objetos, tipos de funciones y tipos de clases.
 
-```ts
+```ts sample0.types.1.ts
 export type User = {
   name: string;
   age: number;
@@ -266,7 +308,7 @@ export interface User {
 
 Igual que en los objetos, en los tipos u en los interfaces se pueden incluir **propiedades opcionales** y **propiedades de solo lectura**.
 
-```ts
+```ts sample0.types.1.ts
 export interface User {
   name: string;
   age: number;
@@ -279,7 +321,7 @@ export interface User {
 
 Las clases en TypeScript son en si mismas una interfaz, por lo que pueden ser utilizadas para definir el tipo de cualquier variable.
 
-```ts
+```ts sample0.types.1.ts
 export class User {
   name: string;
   age: number;
@@ -289,7 +331,7 @@ export class User {
   }
 }
 
-const user: User = { name: "Pepe", age: 30 };
+const user: User = { name: 'Pepe', age: 30 };
 ```
 
 Más adelante se verá el uso de las clases en TypeScript, pero por el momento es importante tener en cuenta que las interfaces y las clases son dos formas diferentes de definir tipos en TypeScript.
@@ -300,16 +342,16 @@ En términos generales los tipos y los interfaces son intercambiables e incluso 
 
 - **Valores primitivos y literales**: los tipos pueden ser utilizados para definir cualquier tipo de TypeScript, incluyendo tipos primitivos y literales, mientras que las interfaces solo pueden ser utilizadas para definir tipos de objetos.
 
-```ts
+```ts sample0.types.1.ts
 type Name = string;
 type Age = number;
 type ID = string | number;
-type Status = "success" | "error";
+type Status = 'success' | 'error';
 ```
 
 - **Fusión de declaraciones (declaration merging)**: las interfaces pueden volver a ser declarados lo que significa que se pueden extender mediante esta técnica para crear interfaces más complejos. Por el contrario, los tipos no pueden extenderse volviendo a ser declarados.
 
-```ts
+```ts sample0.types.2.ts
 interface User {
   name: string;
 }
@@ -326,7 +368,7 @@ En ambos casos existen mecanismos de **extensión**, equivalentes pero diferente
 
 En los interfaces se pueden extender otras interfaces, utilizando la palabra clave `extends`, y se pueden combinar con otras interfaces utilizando el operador `|` (unión).
 
-```ts
+```ts sample0.types.2.ts
 interface User {
   name: string;
 }
@@ -338,7 +380,7 @@ interface Admin extends User {
 
 En el caso de los tipos se pueden combinar con otros tipos utilizando el operador `&` (intersección).
 
-```ts
+```ts sample0.types.2.ts
 type User = {
   name: string;
 };
@@ -350,13 +392,15 @@ type Admin = User & {
 
 En cualquiera de los casos, se puede usar el operador `|` (unión) para combinar tipos o interfaces
 
-```ts
+```ts sample0.types.2.ts
 type User = {
   name: string;
+  boss: string;
 };
 
 interface Admin {
-  role: string;
+  name: string;
+  team: string;
 }
 
 type UserOrAdmin = User | Admin;
@@ -391,7 +435,7 @@ De esta manera pueden definirse
 - las entities (entities) de la aplicación, como usuarios, productos, pedidos, etc.
 - los tipos de datos que se utilizan para el funcionamiento de la aplicación
 
-```ts
+```ts sample1.data.ts
 type User = {
   id: string;
   name: string;
@@ -402,7 +446,7 @@ type User = {
 
 A partir de un tipo de datos, se pueden definir otros tipos de datos más complejos, como por ejemplo un tipo de datos que represente una lista de usuarios.
 
-```ts
+```ts sample1.data.ts
 type UserList = {
   users: User[];
 };
@@ -412,8 +456,8 @@ type UserList = {
 
 Igualmente es posible definir tipos derivados de los ya existentes. Por ejemplo, en el caso de las entidades, es posible definir un tipo de datos que represente su **DTO** (Data Transfer Object), es decir el conjunto de datos que se transfieren al backend para que este pueda crear la entidad completa.
 
-```ts
-type UserDTO = Omit<User, "id">;
+```ts sample1.data.ts
+type UserDTO = Omit<User, 'id'>;
 ```
 
 En la creación del DTO usamos una utilidad de TypeScript, `Omit`, que permite crear un nuevo tipo a partir de otro, omitiendo una o varias propiedades. En este caso, omitimos la propiedad `id` del tipo `User`, ya que no es necesaria para crear el DTO.
@@ -436,7 +480,7 @@ Los componentes de React son funciones que devuelven un elemento de React, del t
 
 El componente mas sencillo es una función que no recibe props y devuelve un elemento de React. En este caso, TypeScript infiere el tipo del componente como `JSX.Element`.
 
-```tsx
+```tsx sample1.hello.tsx
 export const HelloWorld = () => {
   return <h1>Hola Mundo</h1>;
 };
@@ -444,8 +488,8 @@ export const HelloWorld = () => {
 
 Si se prefiere que el tipo del componente sea explícito, se puede usar el tipo `JSX.Element` para definir el tipo de retorno del componente.
 
-```tsx
-import { JSX } from "react";
+```tsx sample1.hello.tsx
+import { JSX } from 'react';
 
 export const HelloWorld: () => JSX.Element = () => {
   return <h1>Hola Mundo</h1>;
@@ -454,7 +498,7 @@ export const HelloWorld: () => JSX.Element = () => {
 
 Otra alternativa es tipar la propia función como `React.FC`, que es un tipo genérico que permite definir el tipo de las props del componente. Este tipo se puede usar para tipar los componentes de React, y se puede combinar con otros tipos para definir el estado del componente.
 
-```tsx
+```tsx sample1.hello.tsx
 export const HelloWorld: React.FC = () => {
   return <h1>Hola Mundo</h1>;
 };
@@ -487,7 +531,7 @@ Una de las principales características de los componentes es su capacidad para 
 
 Tomemos como ejemplo un componente contador, que tiene una prop `initialCount` y más adelante lo completaremos con un estado `count` que se inicializa con el valor de la prop.
 
-```tsx
+```tsx sample2.counters.tsx
 // type CounterProps = {
 type Props = {
   initialCount: number;
@@ -508,7 +552,7 @@ Esta forma de tipar las props podía der algunos problemas en React 17, pero par
 
 En lugar de usar el tipo `React.FC`, y en su genérico tipar las props (React.FC\<Props>), es frecuente usar como componentes funciones tipadas directamente, es decir definir el tipo de los parámetros, dejando implícito el tipo del valor de retorno, que typescript lo inferirá como `JSX.Element` o `ReactNode`, que son los tipos de los elementos de React.
 
-```tsx
+```tsx sample2.counters.tsx
 type Props = {
   initialCount: number;
 };
@@ -532,7 +576,7 @@ useState<Type>() para definir el tipo del estado.
 
 En el caso de un componente contador, el estado `count` se puede definir como un número, y se puede inicializar con el valor de la prop `initialCount`. El hook `useState` devuelve un array con dos elementos: el estado actual y una función para actualizarlo.
 
-```tsx
+```tsx sample2.counters.tsx
 type Props = {
   initialCount: number;
 };
@@ -554,18 +598,20 @@ Los manejadores del evento `onClick`, como cualquier callback, se pueden definir
 
 Esto no es posible si se necesita pasarle parámetros al manejador, ya que como callback, es ejecutado por el sistema y su único parámetro es el objeto evento. En ese caso se puede utilizar una función anónima que a su vez ejecute una llamada a la función nombrada, pasando los parámetros necesarios.
 
-```tsx
-const handleIncrement = (value = 1) => {
+```tsx sample2.counters.tsx
+const handleIncrement = (value = 1): void => {
   setCount(count + value);
 };
 
 return (
   ...
-    <button onClick={handleIncrement}>➕</button>
+    <button onClick={() => handleIncrement()}>➕</button>
     <button onClick={() => handleIncrement(-1)}>➖</button>
    ...
 );
 ```
+
+Más adelante veremos a fondo el uso de los eventos y cómo tiparlos correctamente en los manejadores de eventos de los componentes de React.
 
 #### 📘 Literales y tipos de unión aplicados en componentes React
 
@@ -577,14 +623,15 @@ Uno de sus usos mas comunes es combinarlos con el operador de unión `|` para cr
 
 Como en el siguiente ejemplo, donde se define un tipo `ButtonVariant` que puede ser "primary" o "secondary", y un tipo `Size` que puede ser "small", "medium" o "large".
 
-```tsx
-type ButtonVariant = "primary" | "secondary";
-type Size = "small" | "medium" | "large";
+```tsx sample3.buttons.tsx
+type ButtonVariant = 'primary' | 'secondary';
+type Size = 'small' | 'medium' | 'large';
 
 type ButtonProps = {
   variant: ButtonVariant;
   size: Size;
-  onClick: () => void;
+  // onClick: () => void;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
   children: React.ReactNode;
 };
 
@@ -610,21 +657,60 @@ Además el componente `Button` también acepta una prop `onClick` que es una fun
 
 Finalmente, el componente `Button` también acepta una prop `children`, que es el contenido que se mostrará dentro del botón. Esta prop especial se suele definir como un tipo `React.ReactNode`, que representa cualquier elemento de HTML, incluyendo los componentes de React. En algunos casos interesa añadirle algún tipo más específico, como `string` o `number`, si se quiere restringir el tipo de los hijos del componente.
 
-```tsx
+```tsx sample3.buttons.tsx
 type ButtonProps = {
   variant: ButtonVariant;
   size: Size;
-  onClick: () => void;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
   children: string;
 };
 ```
 
 El componente `Button` se puede usar de la siguiente manera:
 
-```tsx
+```tsx sample3.buttons.tsx
 <Button variant="primary" size="medium" onClick={handleClick}>
   Hacer clic
 </Button>
+```
+
+La prop `children` permite que un componente reciba cualquier contenido, ya sea texto, un elemento HTML o incluso otro componente de React. Esto permite que el componente sea más flexible y reutilizable. A nivel de tipado, la prop `children` se puede definir como Para ello pueden emplearse los tipos
+
+- `JSX.Element` - solo acepta un elemento de React
+- `JSX.Element[]` - no acepta valores más sencillos que un elemento de React, como un string o un número
+- `JSX.Element` | `JSX.Element[]`
+- `React.ReactNode` acepte cualquier elemento de React, incluyendo texto, números, elementos HTML y otros componentes de React.
+- `React.ReactChildren`, es un utility type similar al anterior
+- `React.ReactChild[]`, es un array del tipo anterior
+
+Aunque no es necesario utilizarla, existe un tipo de utilidad de React, PropsWithChildren, que permite definir un tipo de props que incluye la prop `children` de forma implícita. Este tipo se puede usar para definir componentes que aceptan cualquier contenido dentro de ellos.
+
+```tsx sample3.buttons.tsx
+ type BaseProps = {
+    variant: ButtonVariant;
+    size: Size;
+    onClick: React.MouseEventHandler<HTMLButtonElement>
+};  
+
+type FinalProps = PropsWithChildren<BaseProps>;
+```
+
+Este tipo se limita a combinar un genérico y la inclusión de la prop `children`, Su código, que ya nos proporciona React, sería el siguiente
+
+```ts
+type PropsWithChildren<P> = P & { children?: ReactNode | undefined };
+```
+
+Otros tipos de utilidad relacionados con el anterior, que también se incluyen en React, son:
+
+- `FunctionalComponent<Props>` o `FC<Props>`, que ya conocemos
+- `React.ComponentPropsWithoutRef`, que permite obtener las props de un elemento html nativo sin incluir la prop `ref`.
+
+```tsx
+type ButtonProps = React.ComponentPropsWithoutRef<'button'> & {
+  variant: ButtonVariant;
+  size: Size;
+};
 ```
 
 ### 🌐 SOLID: Principio de Responsabilidad Única (SRP)
@@ -693,7 +779,7 @@ La forma en que se realiza la extensión hace que el SyntheticEvent no pueda def
 
 Esto es un problema, ya que al acceder a las propiedades del target, TypeScript no puede inferir el tipo correcto y se produce un error.
 
-```tsx
+```tsx sample4.counters.tsx
 const handleClick = (event: SyntheticEvent<HTMLButtonElement>) => {
   const element = event.target;
   //  element: EventTarget
@@ -702,7 +788,7 @@ const handleClick = (event: SyntheticEvent<HTMLButtonElement>) => {
 
 Por el contrario, el currentTarget es del tipo `C` en el interface `BaseSyntheticEvent`, que corresponde al tipo `EventTarget & T`, del interface `SyntheticEvent`, donde `T` es el tipo del elemento al que se aplica el evento. Esto significa que el currentTarget puede ser de un tipo más específico, como `HTMLInputElement` o `HTMLButtonElement`.
 
-```tsx
+```tsx sample4.counters.tsx
 const handleClick = (event: SyntheticEvent<HTMLButtonElement>) => {
   const element = event.currentTarget;
   //  element: EventTarget & HTMLButtonElement
@@ -736,7 +822,7 @@ Si el manejador (handle) esta registrado en el elemento que desencadena el event
 
 En caso de que el manejador (handle) no esté registrado en el elemento que desencadena el evento, como en el caso de un botón dentro de un formulario, el target y currentTarget serán diferentes. En este caso, para solucionar este problema, se puede usar el casting o aserción de tipos que permite modificar el tipo de un elemento, siempre que estemos absolutamente seguros de que esta modificación es válida.
 
-```tsx
+```tsx sample4.counters.tsx
 const handleClick = (event: SyntheticEvent) => {
   const element = event.target as HTMLButtonElement;
   //  element: HTMLButtonElement
@@ -747,7 +833,7 @@ const handleClick = (event: SyntheticEvent) => {
 
 En nuestro componente Counter, una vez definido correctamente el tipo del elemento, se puede acceder a su propiedad `dataset`, que almacena como objeto todas las propiedades `data-*` del elemento. En este caso, queremos acceder a la propiedad `data-value`, que es un atributo personalizado que se ha añadido al botón.
 
-```tsx
+```tsx sample4.counters.tsx
 const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
   const element = event.currentTarget;
   const value = element.dataset.value;
@@ -757,7 +843,7 @@ const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 
 El dataset esta tipado con el interface `DOMStringMap`, que es una **firmas de índice** (index signatures), que permiten definir un **tipo de objeto** con **propiedades dinámicas**, como sucede con objetos que contienen un número variable de propiedades de nombre no conocido a priori.
 
-```tsx
+```tsx sample4.counters.tsx
 interface DOMStringMap {
   [key: string]: string;
 }
@@ -767,7 +853,7 @@ Esto significa que el dataset puede contener cualquier número de propiedades, y
 
 El resultado final del componente Counter es el siguiente:
 
-```tsx
+```tsx sample4.counters.tsx
 export const CounterWithEvent3: React.FC<Props> = ({ initialCount }) => {
   const [count, setCount] = useState<number>(initialCount);
 
@@ -775,6 +861,33 @@ export const CounterWithEvent3: React.FC<Props> = ({ initialCount }) => {
     const element = event.currentTarget;
     // const element = event.target as HTMLButtonElement;
     //  element: EventTarget
+    const { value } = element.dataset as DOMStringMap;
+    setCount(count + Number(value));
+  };
+
+  return (
+    <div>
+      <h2>Contador</h2>
+      <p>{count}</p>
+      <button onClick={handleClick} data-value={1}>
+        ➕
+      </button>
+      <button onClick={handleClick} data-value={-1}>
+        ➖
+      </button>
+    </div>
+  );
+};
+```
+
+Una alternativa muy similar es usar el tipo nativo de React para la función manejadora de eventos, `React.MouseEventHandler`:
+
+```tsx sample4.counters.tsx
+export const CounterWithEvent4: React.FC<Props> = ({ initialCount }) => {
+  const [count, setCount] = useState<number>(initialCount);
+
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    const element = event.currentTarget;
     const { value } = element.dataset as DOMStringMap;
     setCount(count + Number(value));
   };
@@ -813,9 +926,9 @@ El evento `ChangeEvent` es un evento que se produce cuando el valor de un elemen
 
 De esa manera se puede crear lo que se conoce como un **formulario controlado** de React, donde el valor del campo de texto se almacena en el estado interno del componente formulario y se actualiza cada vez que el campo cambia (el usuario escribe en el campo o selecciona un valor).
 
-```tsx
+```tsx sample5.forms.tsx
 export const SimpleFormComponent = () => {
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // .target: EventTarget & HTMLInputElement
@@ -824,7 +937,7 @@ export const SimpleFormComponent = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with value:", value);
+    console.log('Form submitted with value:', value);
   };
 
   return (
@@ -849,8 +962,8 @@ Veamos un ejemplo de un formulario controlado con múltiples campos, donde
 - se utiliza una función genérica para manejar el cambio de cualquiera de los campos del formulario, y
 - una función para manejar el envío del formulario.
 
-```tsx
-import React, { useState } from "react";
+```tsx sample5.forms.tsx
+import React, { useState } from 'react';
 type FormData = {
   name: string;
   email: string;
@@ -862,8 +975,8 @@ type FormErrors = {
 
 export const FormComponent = () => {
   const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
+    name: '',
+    email: '',
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
 
@@ -876,10 +989,10 @@ export const FormComponent = () => {
     e.preventDefault();
     // Validar el formulario
     if (!formData.name) {
-      setFormErrors({ ...formErrors, name: "El nombre es obligatorio" });
+      setFormErrors({ ...formErrors, name: 'El nombre es obligatorio' });
     } else {
       setFormErrors({});
-      console.log("Formulario enviado:", formData);
+      console.log('Formulario enviado:', formData);
     }
   };
 
@@ -906,9 +1019,9 @@ export const FormComponent = () => {
 
 Si el formulario incluye un campo de tipo `checkbox`, `radiobutton` o `select`, el evento `ChangeEvent` se tipará de forma más extensa, utilizando una unión de tipos, que incluye el tipo `HTMLInputElement` o `HTMLSelectElement`, dependiendo del tipo de elemento al que se aplica el evento. Ademas es código del handler tiene que contemplar el comportamiento de los checkbox, accediendo a pa propiedad checked en lugar de al value.
 
-```tsx
+```tsx sample6.a.course.register.tsx
 const handleChange = (
-  ev: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ev: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 ) => {
   const formControl = ev.target;
   // desestructurar no podría acceder a .checked
@@ -917,7 +1030,7 @@ const handleChange = (
   setUserData({
     ...userData,
     [formControl.name]:
-      formControl.type === "checkbox" ? formControl.checked : formControl.value,
+      formControl.type === 'checkbox' ? formControl.checked : formControl.value,
   });
 };
 ```
@@ -926,7 +1039,7 @@ const handleChange = (
 
 Una alternativa a los formularios controlados son los formularios no controlados, donde el valor los campos (HTMLInput, HTMLSelect o HTMLTextArea) se almacena en el DOM y se accede a ellos solo en el momento de enviar el formulario, sin necesidad de almacenarlos en el estado interno del componente. Esto se puede hacer utilizando una referencia (ref) al elemento del DOM del propio formulario, que se puede obtener del evento submit.
 
-```tsx
+```tsx sample6.b.course.register.tsx
   const handleSubmit = (ev: React.FormEvent<HTMLFormElement>): void => {
       ev.preventDefault();
       const form = ev.currentTarget; // EventTarget & HTMLFormElement
@@ -942,7 +1055,7 @@ A partir de ahí existen diversas posibilidades
 
 ##### 🧿 Componente CourseRegistration
 
-```tsx
+```tsx sample6.b.course.register.tsx
 return (
   <form onSubmit={handleSubmit}>
     <legend>Contacta con nosotros</legend>
@@ -954,7 +1067,7 @@ return (
         placeholder="Dime tu nombre"
         required
         name="userName"
-        value={userData.userName}
+        defaultValue={userData.userName}
       />
     </div>
 
@@ -964,7 +1077,7 @@ return (
         placeholder="Dime tu email"
         required
         name="email"
-        value={userData.email}
+        defaultValue={userData.email}
       />
     </div>
 
@@ -974,7 +1087,7 @@ return (
         placeholder="Dime tu password"
         required
         name="passwd"
-        value={userData.passwd}
+        defaultValue={userData.passwd}
       />
     </div>
 
@@ -983,7 +1096,7 @@ return (
         type="checkbox"
         id="is-ok"
         name="isOkConditions"
-        checked={userData.isOkConditions}
+        defaultChecked={userData.isOkConditions}
       />
       <label htmlFor="is-ok">Acepto las condiciones...</label>
     </div>
@@ -999,7 +1112,7 @@ return (
     </fieldset>
 
     <label htmlFor="course">Elige un curso</label>
-    <select name="course" id="course" value={userData.course}>
+    <select name="course" id="course" defaultValue={userData.course}>
       <option value=""></option>
       <option value="A">Angular</option>
       <option value="R">React</option>
@@ -1013,15 +1126,15 @@ return (
 
 En el método `handleSubmit`, se puede acceder a los valores de los campos del formulario utilizando las propiedades del objeto `HTMLFormElement`, que es el tipo del elemento del formulario. Esto permite acceder a los valores de los campos del formulario sin necesidad de almacenarlos en el estado interno del componente.
 
-```tsx
-const userNameElement = formElements.namedItem("userName") as HTMLInputElement;
-const emailElement = formElements.namedItem("email") as HTMLInputElement;
-const passwdElement = formElements.namedItem("passwd") as HTMLInputElement;
+```tsx sample6.b.course.register.tsx
+const userNameElement = formElements.namedItem('userName') as HTMLInputElement;
+const emailElement = formElements.namedItem('email') as HTMLInputElement;
+const passwdElement = formElements.namedItem('passwd') as HTMLInputElement;
 const isOkConditionsElement = formElements.namedItem(
-  "isOkConditions"
+  'isOkConditions',
 ) as HTMLInputElement;
-const turnElement = formElements.namedItem("turn") as HTMLInputElement;
-const courseElement = formElements.namedItem("course") as HTMLSelectElement;
+const turnElement = formElements.namedItem('turn') as HTMLInputElement;
+const courseElement = formElements.namedItem('course') as HTMLSelectElement;
 const result = {
   userName: userNameElement.value,
   email: emailElement.value,
@@ -1035,13 +1148,13 @@ const result = {
 
 Si queremos refactorizar el código anterior, obtendríamos algo como esto:
 
-```tsx
+```tsx sample6.b.course.register.tsx
 const result: Record<string, string | boolean> = {};
 for (const key of keys) {
   const element = formElements.namedItem(key) as HTMLInputElement;
   // Si el elemento es un checkbox, se obtiene el valor del atributo checked
   result[key] =
-    typeof userData[key] === "boolean"
+    typeof userData[key] === 'boolean'
       ? element.checked
       : (result[key] = element.value);
 }
@@ -1059,23 +1172,23 @@ La interfaz FormData proporciona una iterador que permite obtener un conjunto de
 
 - accediendo manualmente a cada elemento del formData gracias al método get y el nombre del campo
 
-```tsx
+```tsx sample6.b.course.register.tsx
 const formData = new FormData(form);
 const result = {
-  userName: formData.get("userName") as string,
-  email: formData.get("email") as string,
-  passwd: formData.get("passwd") as string,
+  userName: formData.get('userName') as string,
+  email: formData.get('email') as string,
+  passwd: formData.get('passwd') as string,
   // isOkConditions es un booleano, pero FormData devuelve un string
-  isOkConditions: formData.get("isCondition") === "on",
-  turn: formData.get("turn") as string,
-  course: formData.get("course") as string,
+  isOkConditions: formData.get('isCondition') === 'on',
+  turn: formData.get('turn') as string,
+  course: formData.get('course') as string,
 };
 return result;
 ```
 
 - utilizando los métodos de la clase Object, como `Object.entries`, `Object.keys` o `Object.values`, se puede obtener un array de pares clave/valor, donde cada par representa un campo del formulario y su valor.
 
-```tsx
+```tsx sample6.b.course.register.tsx
 const formData = new FormData(form);
 const data: Record<string, FormDataEntryValue> = Object.fromEntries(formData);
 const result = {
@@ -1083,7 +1196,7 @@ const result = {
   email: data.email as string,
   passwd: data.passwd as string,
   // isOkConditions es un booleano, pero FormData devuelve un string
-  isOkConditions: data.isCondition === "on",
+  isOkConditions: data.isCondition === 'on',
   turn: data.turn as string,
   course: data.course as string,
 };
@@ -1092,13 +1205,13 @@ return result;
 
 En lugar de crear el objeto result de forma manual, convendría hacerlo en la iteración, sustituyendo el uso de `fromEntries` por nuestro propio bucle for, que nos permita decidir el resultado en cada caso.
 
-```tsx
+```tsx sample6.b.course.register.tsx
 const formData = new FormData(form);
 const data: Record<string, FormDataEntryValue | boolean> = { ...user };
 
 for (const [key, value] of formData) {
-  if (typeof user[key as keyof typeof user] === "boolean") {
-    data[key] = value === "on";
+  if (typeof user[key as keyof typeof user] === 'boolean') {
+    data[key] = value === 'on';
   }
 }
 
@@ -1107,37 +1220,35 @@ return data;
 
 Este proceso lo podemos encapsular en una función que reciba el formulario y devuelva un objeto con los datos del formulario.
 
-```tsx
+```tsx sample6.b.course.register.tsx
 const getDataForm = (form: HTMLFormElement, user: User): User => {
   const formData = new FormData(form);
   const data: Record<string, FormDataEntryValue | boolean> = { ...user };
 
   for (const [key, value] of formData) {
-    if (typeof user[key as keyof typeof user] === "boolean") {
-      data[key] = value === "on";
+    if (typeof user[key as keyof typeof user] === 'boolean') {
+      data[key] = value === 'on';
     } else {
       data[key] = value;
     }
   }
 
   return data as User;
-};
 ```
 
 El problema de este método es que esta acoplado a que la entidad de los datos sea User. Usando genéricos, se puede hacer más genérica y reutilizable.
 
-```tsx
-type ValidT<T> = T extends Record<string, FormDataEntryValue | boolean>
-  ? T
-  : never;
+```tsx sample6.b.course.register.tsx 
+type ValidT<T> =
+  T extends Record<string, FormDataEntryValue | boolean> ? T : never;
 const getDataForm = <T,>(form: HTMLFormElement, entity: ValidT<T>): T => {
   const formData = new FormData(form);
   const data: Record<string, FormDataEntryValue | boolean> = { ...entity };
 
   for (const [key, value] of formData) {
-    if (typeof entity[key as keyof typeof entity] === "boolean") {
-      data[key] = value === "on";
-    } else if (typeof entity[key as keyof typeof entity] === "string") {
+    if (typeof entity[key as keyof typeof entity] === 'boolean') {
+      data[key] = value === 'on';
+    } else if (typeof entity[key as keyof typeof entity] === 'string') {
       data[key] = value;
     }
   }
@@ -1159,16 +1270,16 @@ Ya hemos visto el uso de tipos de unión en los ejemplos anteriores, donde se de
 
 El mismo principio se puede aplicar a cualquier tipo más complejo, por ejemplo definiendo las props como la unión de varios tipos objeto.
 
-```tsx
+```tsx sample7.profile.tsx
 // Tipos para las distintas formas del perfil
 type AdminProfile = {
-  type: "admin";
+  type: 'admin';
   name: string;
   permissions: string[];
 };
 
 type UserProfile = {
-  type: "user";
+  type: 'user';
   name: string;
   email: string;
 };
@@ -1181,13 +1292,13 @@ type ProfileProps = {
 
 En el componente `ProfileCard`, se puede usar el tipo `ProfileProps` para definir la prop `profile`, que puede ser de tipo `AdminProfile` o `UserProfile`. Esto permite que el componente acepte diferentes tipos de perfiles y maneje cada uno de ellos de manera diferente.
 
-```tsx
+```tsx sample7.profile.tsx
 const ProfileCard: React.FC<ProfileProps> = ({ profile }) => {
   return (
     <div className="card">
       <h2>{profile.name}</h2>
 
-      {profile.type === "admin" ? (
+      {profile.type === 'admin' ? (
         <div>
           <strong>Permisos:</strong>
           <ul>
@@ -1216,7 +1327,7 @@ Como ya hemos visto, se puede usar el operador de intersección `&` para combina
 
 Esto es muy útil para reutilizar estructuras y extender props en componentes complejos. Esta extensión de un tipo base es igual que la que conseguiríamos con los interfaces heredando (`extends`) de otros interfaces, pero con la ventaja de que se pueden combinar tipos de diferentes formas, no solo objetos.
 
-```tsx
+```tsx sample8.box.tsx
 type BaseProps = {
   id: string;
   visible: boolean;
@@ -1251,7 +1362,7 @@ Aquí ComponentProps hereda todas las propiedades de BaseProps y StyleProps. Est
 
 Como ya hemos visto, un alternativa sería la extensión de interfaces, que permite crear un nuevo tipo a partir de otro, heredando todas las propiedades del tipo base.
 
-```tsx
+```tsx sample8.box.tsx
 interface BaseProps {
   id: string;
   visible: boolean;

@@ -1,6 +1,6 @@
-import { type JSX, useState } from "react";
+import { type JSX, type SyntheticEvent, useState } from 'react';
 
-type Contact = {
+export type Contact = {
     userName: string;
     email: string;
     passwd: string;
@@ -9,33 +9,39 @@ type Contact = {
     course: string;
 };
 
-export const Contacts = (): JSX.Element => {
+export type FormErrors = {
+    userName?: string;
+    email?: string;
+    passwd?: string;
+    isOkConditions?: boolean;
+    turn?: string;
+    course?: string;
+};
+
+export const CourseRegistrationE = (): JSX.Element => {
     const initialState: Contact = {
-        userName: "",
-        email: "",
-        passwd: "",
+        userName: '',
+        email: '',
+        passwd: '',
         isOkConditions: false,
-        turn: "",
-        course: "",
+        turn: '',
+        course: '',
     };
     const [userData, setUserData] = useState<Contact>(initialState);
+    // const [formErrors, setFormErrors] = useState<FormErrors>({});
 
-    const handleSubmit = (ev: React.FormEvent): void => {
+    const handleSubmit = (ev: SyntheticEvent): void => {
         ev.preventDefault();
-        console.log("Enviando", userData);
+        console.log('Enviando', userData);
     };
 
-    const handleChange = (
-        ev: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ): void => {
-        const formControl = ev.target;
-        // desestructurar no podría acceder a .checked
-        // se accede más adelante gracias a una guarda de tipos
+    const handleChange = (ev: SyntheticEvent): void => {
+        const formControl = ev.target as HTMLFormElement;
         console.dir(formControl);
         setUserData({
             ...userData,
             [formControl.name]:
-                formControl.type === "checkbox"
+                formControl.type === 'checkbox'
                     ? formControl.checked
                     : formControl.value,
         });
@@ -90,31 +96,13 @@ export const Contacts = (): JSX.Element => {
                 <label htmlFor="is-ok">Acepto las condiciones...</label>
             </div>
 
-            <fieldset name="turn">
+            <fieldset name="turn" onChange={handleChange}>
                 <legend>Selecciona un turno</legend>
-                <input
-                    type="radio"
-                    name="turn"
-                    id="turno-m"
-                    value="M"
-                    onChange={handleChange}
-                />
+                <input type="radio" name="turn" id="turno-m" value="M" />
                 <label htmlFor="turno-m">Mañana</label>
-                <input
-                    type="radio"
-                    name="turn"
-                    id="turno-t"
-                    value="T"
-                    onChange={handleChange}
-                />
+                <input type="radio" name="turn" id="turno-t" value="T" />
                 <label htmlFor="turno-t">Tarde</label>
-                <input
-                    type="radio"
-                    name="turn"
-                    id="turno-n"
-                    value="N"
-                    onChange={handleChange}
-                />
+                <input type="radio" name="turn" id="turno-n" value="N" />
                 <label htmlFor="turno-n">Noche</label>
             </fieldset>
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { type JSX } from "react";
+import { type JSX } from 'react';
 
 type Contact = {
     userName: string;
@@ -15,7 +15,7 @@ type FormElements = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 export const getDataFromHTMLFormExternal = <T extends StringMap>(
     form: HTMLFormElement,
-    { ...data }: T
+    { ...data }: T,
 ): T => {
     // if (!(data instanceof Object)) return
 
@@ -33,7 +33,7 @@ export const getDataFromHTMLFormExternal = <T extends StringMap>(
 
         // Si el elemento es un checkbox, se obtiene el valor del atributo checked
         result[key] =
-            typeof data[key] === "boolean"
+            typeof data[key] === 'boolean'
                 ? (element as HTMLInputElement).checked
                 : (result[key] = element.value);
     }
@@ -41,14 +41,16 @@ export const getDataFromHTMLFormExternal = <T extends StringMap>(
     return result as T;
 };
 
-export const CourseRegistration = (): JSX.Element => {
+// Formulario no controlado de React utilizando HTMLFormElement y FormData
+
+export const CourseRegistrationNC = (): JSX.Element => {
     const userData: Contact = {
-        userName: "",
-        email: "",
-        passwd: "",
+        userName: '',
+        email: '',
+        passwd: '',
         isOkConditions: false,
-        turn: "",
-        course: "",
+        turn: '',
+        course: '',
     };
     // const [userData, setUserData] = useState<Contact>(initialState);
 
@@ -87,7 +89,7 @@ export const CourseRegistration = (): JSX.Element => {
             const element = formElements.namedItem(key) as HTMLInputElement;
             // Si el elemento es un checkbox, se obtiene el valor del atributo checked
             result[key] =
-                typeof userData[key] === "boolean"
+                typeof userData[key] === 'boolean'
                     ? element.checked
                     : (result[key] = element.value);
         }
@@ -115,7 +117,7 @@ export const CourseRegistration = (): JSX.Element => {
             const value = formData.get(key) as string | boolean;
             // Si el elemento es un checkbox, se obtiene el valor del atributo checked
             result[key] =
-                typeof userData[key] === "boolean" ? value === "on" : value;
+                typeof userData[key] === 'boolean' ? value === 'on' : value;
         }
         return result as Contact;
     };
@@ -125,15 +127,15 @@ export const CourseRegistration = (): JSX.Element => {
         const form = ev.currentTarget;
         // Acceso a los datos como elementos del formulario
         const userData1 = getDataFromHTMLForm(form);
-        console.log("Enviando (eleemnts)", userData1);
+        console.log('Enviando (eleemnts)', userData1);
 
         const userData3 = getDataFromHTMLFormExternal(form, userData);
-        console.log("Enviando (eleemnts)", userData3);
+        console.log('Enviando (eleemnts)', userData3);
 
         // Acceso a los datos como FormData
         const formData = new FormData(form);
         const userData2 = getDataFromFormData(formData);
-        console.log("Enviando (formdata)", userData2);
+        console.log('Enviando (formdata)', userData2);
     };
 
     return (
@@ -176,7 +178,7 @@ export const CourseRegistration = (): JSX.Element => {
                     type="checkbox"
                     name="isOkConditions"
                     id="cr-is-ok"
-                    // checked={userData.isOkConditions}
+                    defaultChecked={userData.isOkConditions}
                 />
                 <label htmlFor="is-ok">Acepto las condiciones...</label>
             </div>

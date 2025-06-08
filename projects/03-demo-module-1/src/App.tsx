@@ -3,16 +3,17 @@ import './App.css';
 import { Header } from './components/header/header';
 import { Button1, Button2 } from './components/sample3.buttons';
 import { CounterWithEvent1 } from './components/sample4.counters';
-import { Contacts } from './components/sample6.contacts.';
-import { CourseRegistration } from './components/sample6a.course';
-import { HelloWorld } from './components/sample1.hellow';
+import { CourseRegistrationC } from './components/sample6.a.course.register';
+import { CourseRegistrationNC } from './components/sample6.b.course.register';
+import { HelloWorld } from './components/sample1.hello';
 import { Counter1 } from './components/sample2.counters';
-import { FormComponent2 } from './components/sample5.forms';
+import { FormComponent } from './components/sample5.forms';
 import {
     ProfileCard,
     type ProfileProps,
 } from './components/sample7.profile';
 import { Box } from './components/sample8.box';
+import { StudentCounter } from './components/extra/students.counter';
 
 function App(): JSX.Element {
     const profile: ProfileProps['profile'] = {
@@ -58,16 +59,20 @@ function App(): JSX.Element {
                     <h2>Sample 4 - Counter & Events</h2>
                     <CounterWithEvent1 initialCount={0} />
                 </section>
+                <section id="Sample Extra">
+                    <h2>Sample Extra - Accident Counter</h2>
+                    <StudentCounter />
+                </section>
                 <section id="Sample5">
                     <h2>Sample 5 - Form</h2>
-                    <FormComponent2 />
+                    <FormComponent />
                 </section>
                 <section id="Sample6">
                     <h2>Sample 6 - Contacts</h2>
                     <p>
                         Ejemplo de formulario controlado: Registro en un curso
                     </p>
-                    <Contacts />
+                    <CourseRegistrationC />
                 </section>
                 <section id="Sample6a">
                     <h2>Sample 6a - Course Registration</h2>
@@ -75,7 +80,7 @@ function App(): JSX.Element {
                         Ejemplo de formulario NO controlado: Registro en un
                         curso
                     </p>
-                    <CourseRegistration />
+                    <CourseRegistrationNC />
                 </section>
                 <section id="Sample7n8">
                     <h2>Sample 8 - Box</h2>

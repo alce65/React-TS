@@ -1,6 +1,6 @@
-import { type JSX, type SyntheticEvent, useState } from 'react';
+import { type JSX, useState } from 'react';
 
-export type Contact = {
+type Register = {
     userName: string;
     email: string;
     passwd: string;
@@ -9,17 +9,10 @@ export type Contact = {
     course: string;
 };
 
-export type FormErrors = {
-    userName?: string;
-    email?: string;
-    passwd?: string;
-    isOkConditions?: boolean;
-    turn?: string;
-    course?: string;
-};
+// Formulario controlado de React
 
-export const Contacts = (): JSX.Element => {
-    const initialState: Contact = {
+export const CourseRegistrationC = (): JSX.Element => {
+    const initialState: Register = {
         userName: '',
         email: '',
         passwd: '',
@@ -27,16 +20,19 @@ export const Contacts = (): JSX.Element => {
         turn: '',
         course: '',
     };
-    const [userData, setUserData] = useState<Contact>(initialState);
-    // const [formErrors, setFormErrors] = useState<FormErrors>({});
+    const [userData, setUserData] = useState<Register>(initialState);
 
-    const handleSubmit = (ev: SyntheticEvent): void => {
+    const handleSubmit = (ev: React.FormEvent): void => {
         ev.preventDefault();
         console.log('Enviando', userData);
     };
 
-    const handleChange = (ev: SyntheticEvent): void => {
-        const formControl = ev.target as HTMLFormElement;
+    const handleChange = (
+        ev: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    ): void => {
+        const formControl = ev.target;
+        // desestructurar no podría acceder a .checked
+        // se accede más adelante gracias a una guarda de tipos
         console.dir(formControl);
         setUserData({
             ...userData,
@@ -49,7 +45,7 @@ export const Contacts = (): JSX.Element => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <legend>Contacta con nosotros</legend>
+            <legend>Regístrate con nosotros</legend>
             <p>Ejemplo de 'Controlled Form'</p>
 
             <div className="group-control">
@@ -96,13 +92,31 @@ export const Contacts = (): JSX.Element => {
                 <label htmlFor="is-ok">Acepto las condiciones...</label>
             </div>
 
-            <fieldset name="turn" onChange={handleChange}>
+            <fieldset name="turn">
                 <legend>Selecciona un turno</legend>
-                <input type="radio" name="turn" id="turno-m" value="M" />
+                <input
+                    type="radio"
+                    name="turn"
+                    id="turno-m"
+                    value="M"
+                    onChange={handleChange}
+                />
                 <label htmlFor="turno-m">Mañana</label>
-                <input type="radio" name="turn" id="turno-t" value="T" />
+                <input
+                    type="radio"
+                    name="turn"
+                    id="turno-t"
+                    value="T"
+                    onChange={handleChange}
+                />
                 <label htmlFor="turno-t">Tarde</label>
-                <input type="radio" name="turn" id="turno-n" value="N" />
+                <input
+                    type="radio"
+                    name="turn"
+                    id="turno-n"
+                    value="N"
+                    onChange={handleChange}
+                />
                 <label htmlFor="turno-n">Noche</label>
             </fieldset>
 
