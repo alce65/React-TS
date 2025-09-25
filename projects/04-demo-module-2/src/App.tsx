@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import './App.css';
 import { Header } from './components/header/header';
 import { UserInfo } from './components/sample8.2.overload.';
-import { ItemsWrapper } from './components/sample9.props.effect';
+import { ItemsWrapper } from './components/sample9.3.props.effect';
 import { FormFocus } from './components/sample10.focus';
 import { FormFocusDS } from './components/sample10a.focus_ds';
 import { TestHookComponent } from './hooks/sample11.hooks';
