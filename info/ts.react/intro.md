@@ -237,6 +237,12 @@ Update `vitest.config.ts` to add the `setupFiles` property:
 setupFiles: ["./testConfig.ts"];
 ```
 
+Igualmente añadimos al fichero vite-env.dts,
+
+```dts
+/// <reference types="@testing-library/jest-dom" />
+```
+
 #### Herramientas de edición de código
 
 #### EditorConfig

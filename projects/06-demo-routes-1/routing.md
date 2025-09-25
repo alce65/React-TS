@@ -280,7 +280,7 @@ export const Layout: React.FC<Props> = ({ title = '' }) => {
 };
 ```
 
-Su test tanbién se simplifica al no necesitar comprobar que se renderizan los hijos, ya que el `Outlet` se encargará de ello:
+Su test también se simplifica al no necesitar comprobar que se renderizan los hijos, ya que el `Outlet` se encargará de ello:
 
 ```tsx
 vi.mock('../header/header');

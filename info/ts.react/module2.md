@@ -10,6 +10,7 @@ module: 2
     - [🧿 Uso dentro de los componente DisplayField -\> UserInfo](#-uso-dentro-de-los-componente-displayfield---userinfo)
   - [📘 Tipado de useState, useEffect y hooks básicos](#-tipado-de-usestate-useeffect-y-hooks-básicos)
     - [useState](#usestate)
+      - [Tipos never y unknown](#tipos-never-y-unknown)
     - [useEffect](#useeffect)
     - [🧿 Componente Item: useEffect y el array de dependencias](#-componente-item-useeffect-y-el-array-de-dependencias)
     - [useCallback](#usecallback)
@@ -55,7 +56,7 @@ La **sobrecargas de funciones** (**function overloads**) consiste en definir una
 
 Esto es útil cuando una función puede aceptar distintos tipos de argumentos y retornar diferentes tipos según el caso.
 
-```ts
+```ts sample8.1.overload..tsx
 function format(value: string): string;
 function format(value: number): string;
 function format(value: string | number): string {
@@ -75,7 +76,7 @@ En React, la sobrecarga de funciones se puede aplicar a funciones que manejan ev
 
 Una función que formatea el valor mostrado en un campo dependiendo de si se trata de un número, una fecha, o una cadena.
 
-```ts
+```ts sample8.2.overload..tsx
 // 1️⃣ Firmas de sobrecarga
 function getDisplayValue(value: string): string;
 function getDisplayValue(value: number, decimals: number): string;
@@ -100,7 +101,7 @@ function getDisplayValue(
 
 #### 🧿 Uso dentro de los componente DisplayField -> UserInfo
 
-```tsx
+```tsx sample8.2.overload..tsx
 type Props = {
   label: string;
   value: number | Date | string;
@@ -138,7 +139,7 @@ export const DisplayField: React.FC<Props> = ({ label, value, options }) => {
 
 Ejemplo de uso en un componente padre
 
-```tsx
+```tsx sample8.2.overload..tsx
 export const UserInfo: React.FC = () => {
   return (
     <div>
@@ -169,13 +170,55 @@ Como ya hemos visto, `useState<T>()` permite utilizar genéricos para definir el
 - el valor inicial es `undefined` o `null`,
 - el tipo inicial no es primitivo y el tipo debe corresponder a un tipo nombrado.
 
-Por ejemplo, si tienes un estado que es un array inicialmente vacío, puedes definirlo así:
+Por ejemplo, si tienes un estado que es un objeto inicialmente inexistente, puedes definirlo así:
+
+```tsx
+const [count, setCount] = useState<User | undefined>();
+const [count, setCount] = useState<User | null>(null);
+```
+
+En caso de que el estado sea un array inicialmente vacío, puedes definirlo así:
 
 ```tsx
 const [count, setCount] = useState<User[]>([]);
 ```
 
-De esta forma el array se inicializa como vacío, pero el tipo de los elementos del array es `User`, y no `any`.
+De esta forma el array se inicializa como vacío, pero el tipo de los elementos del array es `User`, y no `never`.
+
+##### Tipos never y unknown
+
+Si se proporciona un array vacío como valor inicial, TypeScript infiere el tipo como `never[]`, lo que puede causar problemas si se intenta añadir elementos de un tipo específico al array.
+
+```tsx
+const [items, setItems] = useState([]); // items es inferido como never[]
+setItems([{ id: 1, name: 'Item 1' }]); // Error: Type '{ id: number; name: string; }' is not assignable to type 'never'.
+```
+
+En caso de que fuera imposible conocer a priory el tipo de los elementos del array, el tipo de `useState` podría ser `unknown[]`, pero esto no es recomendable, ya que
+
+- permite asignar al estado cualquier tipo de valor, lo que puede llevar a errores en tiempo de ejecución,
+- no permite utilizar loas valores del array sin un casting (aserción) de tipo previo.
+
+```tsx sample9.1.state.tsx
+const [items, setItems] = useState<unknown[]>([]);
+useEffect(() => {
+  // Simulate a state change
+  setState(['Pepe', 'Luis', 'Juana']);
+}, []);
+
+return (
+  <div>
+    <h1>Sample 9.1</h1>
+    <p>State management with useState</p>
+    <p>{state.length}</p>
+    <ul>
+      {state.map((item, index) => (
+        <li key={index}>{item as string}</li>
+      ))}
+    </ul>
+  </div>
+);
+```
 
 #### useEffect
 
