@@ -120,7 +120,7 @@ Según ellos mismos <https://vite.dev/>
 Para crear un nuevo proyecto con Vite, se puede utilizar el siguiente comando:
 
 ```shell
-$ npm create vite@latest
+npm create vite@latest
 ```
 
 Esto iniciará un asistente que te guiará a través de la creación del proyecto. Puedes elegir entre diferentes plantillas, como React, Vue, Svelte, etc.
