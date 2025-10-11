@@ -1,4 +1,5 @@
 {
+  "eslint.options": { "configFile": "/eslint.config.js" },
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#13a1d7",
     "activityBar.background": "#13a1d7",
@@ -21,6 +22,7 @@
   "peacock.color": "#0f7ea8",
   "cSpell.words": [
     "autocompletado",
+    "bootcamp",
     "decrementar",
     "definirla",
     "definirlo",
