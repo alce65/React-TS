@@ -124,7 +124,7 @@ Lo que testamos es que es capaz de llamar a los componentes `Header` y `Footer`,
 
 #### Test de las rutas
 
-Para testar las rutas, se puede hacer de forma similar al test de `AppRoutes.tsx`, empleando en lugar de un `MemoryRouter` un `createMemoryRouter`, que recibirá como parametros el array de rutas y un objeto con la ruta activa de cada caso de test:
+Para testar las rutas, se puede hacer de forma similar al test de `AppRoutes.tsx`, empleando en lugar de un `MemoryRouter` un `createMemoryRouter`, que recibirá como parameters el array de rutas y un objeto con la ruta activa de cada caso de test:
 
 ```tsx
 import { render, screen } from '@testing-library/react';
@@ -416,7 +416,7 @@ const loadProductData = async (): Promise<Product[]> => {
   },
 ```
 
-En el componente se puede acceder a los datos de forma sincrona utilizando el hook `useLoaderData` de React Router, que devuelve los datos cargados por el loader:
+En el componente se puede acceder a los datos de forma síncrona utilizando el hook `useLoaderData` de React Router, que devuelve los datos cargados por el loader:
 
 ```tsx
 import { useLoaderData } from 'react-router';
