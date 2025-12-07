@@ -54,6 +54,17 @@ module: 1
 
 ## 🧩 MÓDULO 1: Tipos (Avanzados) en TypeScript para React
 
+- 🎯Objetivos del módulo
+- 🧠Inferencia y anotación de tipos
+- 🧠Tipos propios (custom Types)
+- Tipado de los datos
+- 🌐Tipado de los componentes
+- 🌐SOLID: Principio de Responsabilidad Única (SRP)
+- 🌐Tipado de eventos del DOM
+- 🌐Formularios
+- 📘Tipos de unión, intersección aplicados en componentes React
+- 📝Ejercicios sugeridos
+
 ### 🎯 Objetivos del módulo
 
 - Comprender el concepto de inferencia v. anotación de tipos

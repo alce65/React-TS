@@ -13,6 +13,12 @@ module: 5
 
 ## 🧩 MÓDULO 5: INTEGRACIÓN DE LIBRERÍAS Y HERRAMIENTAS EN REACT CON TYPESCRIPT
 
+- 🎯 Objetivos del módulo
+- 📘 Tipado e integración de librerías comunes en React (React Router, Redux, etc.)
+- 📘 Configuración de definiciones de tipos con @types
+- 📘 Optimización de proyectos React-TS con herramientas de construcción como Vite
+- 🌐 React Router
+
 ### 🎯 Objetivos del módulo
 
 - Aprender a integrar librerías populares del ecosistema React con soporte para TypeScript.

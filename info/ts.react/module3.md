@@ -37,6 +37,13 @@ module: 3
 
 ## 🧩 MÓDULO 3: PROGRAMACIÓN ORIENTADA A OBJETOS y COMPONENTES EN REACT
 
+- 🎯 Objetivos del módulo
+- 🧠 Clases en ES6 y TypeScript
+- 📘 Clases y componentes basados en clases
+- 🌐 Servicios basados en clases
+- 🌐 Patrones de inyección e inversión de dependencias
+- 📝 Ejercicios sugeridos
+
 ### 🎯 Objetivos del módulo
 
 - Comprender la programación orientada a objetos en JavaScript y TypeScript.

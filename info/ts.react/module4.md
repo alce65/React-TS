@@ -18,6 +18,13 @@ module: 4
 
 ## 🧩 MÓDULO 4: ESTRUCTURACIÓN Y MÓDULOS EN PROYECTOS REACT
 
+- 🎯 Objetivos del módulo
+- 📘 Estructura modular en proyectos React
+- 📘 Importación y exportación de componentes tipados
+- 📘 Configuración avanzada de tsconfig.json
+- 📘 Uso de namespaces en aplicaciones grandes
+- 📝 Ejercicios sugeridos
+
 ### 🎯 Objetivos del módulo
 
 Al finalizar este módulo, serás capaz de:

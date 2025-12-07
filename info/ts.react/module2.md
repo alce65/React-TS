@@ -42,6 +42,14 @@ module: 2
 
 ## 🧩 MÓDULO 2: Funciones y Hooks con TypeScript en React
 
+- 🎯Objetivos del módulo
+- 📘Sobrecarga de funciones y tipos de retorno
+- 📘Tipado de useState, useEffect y hooks básicos
+- 📘Hooks personalizados (custom hooks) tipados
+- 📘Callbacks y promesas en React
+- 🌐Patrón Flux: reducers y actions
+- 📝Ejercicios sugeridos
+
 ### 🎯 Objetivos del módulo
 
 - Comprender y aplicar la sobrecarga de funciones en TypeScript.
