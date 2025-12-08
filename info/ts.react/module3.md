@@ -708,7 +708,7 @@ export const useUser: UseUserHook = ({ id = 1, repo }) => {
   const [error, setError] = useState<UserState["error"]>(null);
 
   const load = useCallback(async (): Promise<void> => {
-    console.log("loadinng");
+    console.log("loading");
     setLoading(true);
     try {
       const user = await repo.getUserById(id);
